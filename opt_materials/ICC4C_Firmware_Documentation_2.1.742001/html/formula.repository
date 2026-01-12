@@ -1,0 +1,4 @@
+\_form#0=569x19:$ K_{scheduled} = K + A^2 * scheduling\_variable + B * scheduling\_variable + C $
+\_form#1=40x23:$ \frac{20000}{2^{32}-1} $
+\_form#2=319x33:$ y_k = \frac{1}{a_0} \Big\{ \sum_{i=0}^n b_ix_{(k-i)} - \sum_{j=1}^m a_jy_{(k-j)} \Big\} $
+\_form#3=599x39:$ reg\_idx = path\_idx \times (STAGE\_NBR \times CHANNEL\_NBR) + channel\_idx \times STAGE\_NBR + stage\_idx $
