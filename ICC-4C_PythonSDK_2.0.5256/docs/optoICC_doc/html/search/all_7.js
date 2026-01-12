@@ -1,0 +1,13 @@
+var searchData=
+[
+  ['below_20for_20an_20overview_20of_20the_20board_20level_20utility_20commands_0',['Check out the link below for an overview of the Board-level utility commands',['../eccexamples.html#utils',1,'']]],
+  ['board_1',['board',['../examples.html#autotoc_md5',1,'Download a saved vector from the board.'],['../examples.html#autotoc_md8',1,'Upload a trapezoidal vector to the board.']]],
+  ['board_20level_20utility_20commands_2',['Check out the link below for an overview of the Board-level utility commands',['../eccexamples.html#utils',1,'']]],
+  ['board_5fmcu_5ftemperature_3',['board_mcu_temperature',['../classopto_i_c_c_1_1registers_1_1icc__registers_1_1_i_c_c_temperature_manager.html#a5ea6f81a10aa9e28fc52ad04b69c57d2',1,'optoICC::registers::icc_registers::ICCTemperatureManager']]],
+  ['board_5fmcu_5fthreshold_4',['board_mcu_threshold',['../classopto_i_c_c_1_1registers_1_1icc__registers_1_1_i_c_c_temperature_manager.html#aaf317af8940cf52bf455401c59804a81',1,'optoICC::registers::icc_registers::ICCTemperatureManager']]],
+  ['board_5fout_5ftemperature_5',['board_out_temperature',['../classopto_i_c_c_1_1registers_1_1icc__registers_1_1_i_c_c_temperature_manager.html#ad1dc275c8df96b722fdeaad459037727',1,'optoICC::registers::icc_registers::ICCTemperatureManager']]],
+  ['board_5fout_5fthreshold_6',['board_out_threshold',['../classopto_i_c_c_1_1registers_1_1icc__registers_1_1_i_c_c_temperature_manager.html#adc3e2ee894b3659e3d6d085fdbcc5084',1,'optoICC::registers::icc_registers::ICCTemperatureManager']]],
+  ['board_5fpwr_5ftemperature_7',['board_pwr_temperature',['../classopto_i_c_c_1_1registers_1_1icc__registers_1_1_i_c_c_temperature_manager.html#ab58d8948e0ad3fb4837ef529f7c96804',1,'optoICC::registers::icc_registers::ICCTemperatureManager']]],
+  ['board_5fpwr_5fthreshold_8',['board_pwr_threshold',['../classopto_i_c_c_1_1registers_1_1icc__registers_1_1_i_c_c_temperature_manager.html#a02947a613969d887d1c4b6a1585fad95',1,'optoICC::registers::icc_registers::ICCTemperatureManager']]],
+  ['boardeeprom_5fparsing_5fresult_9',['BoardEEPROM_parsing_result',['../classopto_i_c_c_1_1registers_1_1board_e_e_p_r_o_m__registers_1_1_i_c_c4c_board_e_e_p_r_o_m.html#ab0515ee42e99ec017255ef8663f79afe',1,'optoICC.registers.boardEEPROM_registers.ICC4cBoardEEPROM.BoardEEPROM_parsing_result'],['../classopto_i_c_c_1_1registers_1_1board_e_e_p_r_o_m__registers_1_1_i_c_c1c_board_e_e_p_r_o_m.html#a99758e68caa2f852c062d8eac382b80e',1,'optoICC.registers.boardEEPROM_registers.ICC1cBoardEEPROM.BoardEEPROM_parsing_result'],['../classopto_i_c_c_1_1registers_1_1board_e_e_p_r_o_m__registers_1_1_e_c_c1c_board_e_e_p_r_o_m.html#a612c46013561029c383c1624f4be83bf',1,'optoICC.registers.boardEEPROM_registers.ECC1cBoardEEPROM.BoardEEPROM_parsing_result']]]
+];

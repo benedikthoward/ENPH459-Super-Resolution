@@ -1,0 +1,24 @@
+var searchData=
+[
+  ['fast_5fautofocus_0',['FAST_AUTOFOCUS',['../classopto_kummenberg_1_1tools_1_1definitions_1_1_waveform_shape.html#ab2c2d4c133c618093d64b5b43d51b0c8',1,'optoKummenberg.tools.definitions.WaveformShape.FAST_AUTOFOCUS'],['../classopto_kummenberg_1_1tools_1_1definitions_1_1_waveforms.html#a8adc34f18f62bffda49040c72dd4a161',1,'optoKummenberg.tools.definitions.Waveforms.FAST_AUTOFOCUS']]],
+  ['fast_5faxis_5frange_1',['fast_axis_range',['../classopto_kummenberg_1_1registers_1_1_input_stage_1_1_raster_scan.html#a5b6e0648cf38cf156da2ff784cafd92c',1,'optoKummenberg::registers::InputStage::RasterScan']]],
+  ['feed_5fback_2',['FEED_BACK',['../classopto_kummenberg_1_1tools_1_1definitions_1_1_en_signal_flow_path.html#a66d8ac548e47e13d9aae7c3b32c955cb',1,'optoKummenberg::tools::definitions::EnSignalFlowPath']]],
+  ['feed_5fforward_3',['FEED_FORWARD',['../classopto_kummenberg_1_1tools_1_1definitions_1_1_en_signal_flow_path.html#a8ab479e3a2b0f0b113ca03d9a20fa1d0',1,'optoKummenberg::tools::definitions::EnSignalFlowPath']]],
+  ['feed_5fthrough_5fenabled_4',['feed_through_enabled',['../classopto_kummenberg_1_1registers_1_1_control_stage_1_1_current_feed_through.html#a2772f044415cfd8eb79c752043bfd96a',1,'optoKummenberg::registers::ControlStage::CurrentFeedThrough']]],
+  ['feedback_5',['feedBack',['../classopto_kummenberg_1_1registers_1_1_signal_flow_manager_1_1_signal_flow_manager.html#a81db8675b601c1628c69ba653f6dc21b',1,'optoKummenberg::registers::SignalFlowManager::SignalFlowManager']]],
+  ['feedforward_6',['feedForward',['../classopto_kummenberg_1_1registers_1_1_signal_flow_manager_1_1_signal_flow_manager.html#a27b8b400dcbb4daf8bb2c2423bceb208',1,'optoKummenberg::registers::SignalFlowManager::SignalFlowManager']]],
+  ['feedthrough_7',['FeedThrough',['../classopto_kummenberg_1_1connections_1_1_channel.html#adcfe8e80adb7a0cebdbb3ab5d19201a1',1,'optoKummenberg::connections::Channel']]],
+  ['firmware_5fid_8',['firmware_id',['../classopto_kummenberg_1_1registers_1_1_misc_systems_1_1_status.html#a6b09add983bcf97edd17e0b84f3a7ad5',1,'optoKummenberg::registers::MiscSystems::Status']]],
+  ['fmr_9',['FMR',['../classopto_kummenberg_1_1tools_1_1definitions_1_1_device_model.html#a81b9d39e0a2ba7bbd97e865e2d9fad4e',1,'optoKummenberg::tools::definitions::DeviceModel']]],
+  ['fmr_5f2ch_10',['FMR_2CH',['../classopto_kummenberg_1_1tools_1_1definitions_1_1_device_model.html#a6202981414558cc2de5407d96e3cb967',1,'optoKummenberg::tools::definitions::DeviceModel']]],
+  ['fp_11',['FP',['../classopto_kummenberg_1_1tools_1_1definitions_1_1_unit_type.html#a1d4086b49528563e7e522f40099b5675',1,'optoKummenberg.tools.definitions.UnitType.FP'],['../classopto_kummenberg_1_1tools_1_1definitions_1_1_units.html#a8d74849c5beb34d5722fa59a96cc85d7',1,'optoKummenberg.tools.definitions.Units.FP']]],
+  ['frame_5fboundary_12',['FRAME_BOUNDARY',['../namespaceopto_kummenberg_1_1tools_1_1definitions.html#a5bce61eeea6daf3aae5eb41575a39061',1,'optoKummenberg::tools::definitions']]],
+  ['frequency_13',['frequency',['../classopto_kummenberg_1_1registers_1_1_input_stage_1_1_signal_generator.html#a1a5150722e1e594fb9ca5dd64e5c2949',1,'optoKummenberg.registers.InputStage.SignalGenerator.frequency'],['../classopto_kummenberg_1_1registers_1_1_input_stage_1_1_raster_scan.html#a340a099b4c9c2050552341d51d1db86f',1,'optoKummenberg.registers.InputStage.RasterScan.frequency']]],
+  ['frequency_5fspeed_14',['frequency_speed',['../classopto_kummenberg_1_1registers_1_1_input_stage_1_1_vector_pattern_unit.html#a6fbe5e96a5db4116214e1db821c58f08',1,'optoKummenberg::registers::InputStage::VectorPatternUnit']]],
+  ['fw_5fbranch_15',['fw_branch',['../classopto_kummenberg_1_1registers_1_1_misc_systems_1_1_status.html#a6d186773b9dfd4bbc8a872aa94b03a39',1,'optoKummenberg::registers::MiscSystems::Status']]],
+  ['fw_5ftype_16',['fw_type',['../classopto_kummenberg_1_1registers_1_1_misc_systems_1_1_status.html#a7574e25296843280a6d869b834c367d6',1,'optoKummenberg::registers::MiscSystems::Status']]],
+  ['fw_5fversion_5fbuild_17',['fw_version_build',['../classopto_kummenberg_1_1registers_1_1_misc_systems_1_1_status.html#aae8bb339d61b9e3b63960deb3ec9832c',1,'optoKummenberg::registers::MiscSystems::Status']]],
+  ['fw_5fversion_5fmajor_18',['fw_version_major',['../classopto_kummenberg_1_1registers_1_1_misc_systems_1_1_status.html#a27be32198413e0417bbfa5f20b5fa82a',1,'optoKummenberg::registers::MiscSystems::Status']]],
+  ['fw_5fversion_5fminor_19',['fw_version_minor',['../classopto_kummenberg_1_1registers_1_1_misc_systems_1_1_status.html#aa3344a53a15fffd9a70353119fc1efc1',1,'optoKummenberg::registers::MiscSystems::Status']]],
+  ['fw_5fversion_5frevision_20',['fw_version_revision',['../classopto_kummenberg_1_1registers_1_1_misc_systems_1_1_status.html#acd2d314905fcfb3264117c30849bdb10',1,'optoKummenberg::registers::MiscSystems::Status']]]
+];

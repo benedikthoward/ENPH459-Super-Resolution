@@ -1,0 +1,26 @@
+var searchData=
+[
+  ['mac_5faddr_0',['MAC_addr',['../classopto_i_c_c_1_1registers_1_1board_e_e_p_r_o_m__registers_1_1_i_c_c4c_board_e_e_p_r_o_m.html#a1376d70722959e66c970ba3afe1d3bef',1,'optoICC.registers.boardEEPROM_registers.ICC4cBoardEEPROM.MAC_addr'],['../classopto_i_c_c_1_1registers_1_1board_e_e_p_r_o_m__registers_1_1_i_c_c1c_board_e_e_p_r_o_m.html#a201c0fd39d3ed4e50f9444662ed34b40',1,'optoICC.registers.boardEEPROM_registers.ICC1cBoardEEPROM.MAC_addr']]],
+  ['max_5fgua_5ftemperature_1',['max_gua_temperature',['../classopto_i_c_c_1_1registers_1_1icc__registers_1_1_lens_compensation.html#a26b0d4ca02cb817c218ebcf8d82c7ae7',1,'optoICC::registers::icc_registers::LensCompensation']]],
+  ['max_5flim_5fred_2',['max_lim_red',['../classopto_i_c_c_1_1registers_1_1icc__registers_1_1_lens_compensation.html#a2cee1b4ec54c56e09b7239c0ac02205c',1,'optoICC::registers::icc_registers::LensCompensation']]],
+  ['max_5flim_5fscroll_3',['max_lim_scroll',['../classopto_i_c_c_1_1registers_1_1icc__registers_1_1_lens_compensation.html#a3fa39e27fa58f6a36fd74029a8a969de',1,'optoICC::registers::icc_registers::LensCompensation']]],
+  ['max_5flim_5fyellow_4',['max_lim_yellow',['../classopto_i_c_c_1_1registers_1_1icc__registers_1_1_lens_compensation.html#ac735ccf3a532d526e7345b8ea0b232c2',1,'optoICC::registers::icc_registers::LensCompensation']]],
+  ['max_5fneg_5fcurrent_5',['max_neg_current',['../classopto_i_c_c_1_1registers_1_1icc__registers_1_1_device_e_e_p_r_o_m.html#a32fa217a64e424e266aa7a2d0dbd9a5d',1,'optoICC::registers::icc_registers::DeviceEEPROM']]],
+  ['max_5fpos_5fcurrent_6',['max_pos_current',['../classopto_i_c_c_1_1registers_1_1icc__registers_1_1_device_e_e_p_r_o_m.html#a08ccb9c43c886348802896f28d64aff8',1,'optoICC::registers::icc_registers::DeviceEEPROM']]],
+  ['mcu_5fid_7',['mcu_id',['../classopto_i_c_c_1_1registers_1_1icc__registers_1_1_i_c_c_status.html#ae9907518841c98cde2b4da4181e2477b',1,'optoICC::registers::icc_registers::ICCStatus']]],
+  ['mcu_5fload_8',['mcu_load',['../classopto_i_c_c_1_1registers_1_1icc__registers_1_1_i_c_c_status.html#ad2a0e63e16d9e6877bbff3fdc4d34083',1,'optoICC::registers::icc_registers::ICCStatus']]],
+  ['mcu_5foverload_5fcounter_9',['mcu_overload_counter',['../classopto_i_c_c_1_1registers_1_1icc__registers_1_1_i_c_c_status.html#a2c63c673525634ca015820c1c571e1ec',1,'optoICC::registers::icc_registers::ICCStatus']]],
+  ['mcu_5ftype_10',['mcu_type',['../classopto_i_c_c_1_1registers_1_1icc__registers_1_1_i_c_c_status.html#a53592ebfcb84b60762606945b6bf70aa',1,'optoICC::registers::icc_registers::ICCStatus']]],
+  ['min_5fgua_5ftemperature_11',['min_gua_temperature',['../classopto_i_c_c_1_1registers_1_1icc__registers_1_1_lens_compensation.html#a94d7c7014adcf3f3b6a63b14f5b206d4',1,'optoICC::registers::icc_registers::LensCompensation']]],
+  ['min_5flim_5fred_12',['min_lim_red',['../classopto_i_c_c_1_1registers_1_1icc__registers_1_1_lens_compensation.html#aa7b68d306b0bf069e17f9ad902c77b94',1,'optoICC::registers::icc_registers::LensCompensation']]],
+  ['min_5flim_5fscroll_13',['min_lim_scroll',['../classopto_i_c_c_1_1registers_1_1icc__registers_1_1_lens_compensation.html#a157d2c1dcc36d1f96386af2eb1d71ad1',1,'optoICC::registers::icc_registers::LensCompensation']]],
+  ['min_5flim_5fyellow_14',['min_lim_yellow',['../classopto_i_c_c_1_1registers_1_1icc__registers_1_1_lens_compensation.html#a01ad5bf477b3101c16794362e8bd58ba',1,'optoICC::registers::icc_registers::LensCompensation']]],
+  ['miscfeatures_15',['MiscFeatures',['../classopto_i_c_c_1_1ecc1c_1_1_e_c_c1c_board.html#abb336633c3e476541476dd07345355cf',1,'optoICC.ecc1c.ECC1cBoard.MiscFeatures'],['../classopto_i_c_c_1_1icc1c_1_1_i_c_c1c_board.html#a63ae3d75dd8cf4cfde3a9a34968f765d',1,'optoICC.icc1c.ICC1cBoard.MiscFeatures'],['../classopto_i_c_c_1_1icc4c_1_1_i_c_c4c_board.html#a842ab7b66a223b1b78d901b3789bd437',1,'optoICC.icc4c.ICC4cBoard.MiscFeatures']]],
+  ['mode_204_20set_20output_20limiting_16',['(1) Set Input Stage &amp;gt; (2) Set Input Conditioning &amp;gt; (3) Set Control Mode &amp;gt; (4) Set Output Limiting',['../eccexamples.html#autotoc_md12',1,'']]],
+  ['more_20examples_17',['More Examples',['../index.html#more',1,'']]],
+  ['move_5frate_5fx_18',['move_rate_x',['../classopto_i_c_c_1_1registers_1_1icc__registers_1_1_saryn_control.html#a1e36cf8a8a93dd2298daff6fc6691284',1,'optoICC::registers::icc_registers::SarynControl']]],
+  ['move_5frate_5fy_19',['move_rate_y',['../classopto_i_c_c_1_1registers_1_1icc__registers_1_1_saryn_control.html#a5193c06c13a7f5b00197bed8ec9044b0',1,'optoICC::registers::icc_registers::SarynControl']]],
+  ['mr_5f10_5f30_20',['MR_10_30',['../classopto_i_c_c_1_1tools_1_1definitions_1_1_device_model.html#a38df81a43ab925797a6a2b6920ee251a',1,'optoICC::tools::definitions::DeviceModel']]],
+  ['mr_5f15_5f30_21',['MR_15_30',['../classopto_i_c_c_1_1tools_1_1definitions_1_1_device_model.html#ae069435410b324114f04f4f406bd6aaa',1,'optoICC::tools::definitions::DeviceModel']]],
+  ['mr_5f15_5f30_5f2ch_22',['MR_15_30_2CH',['../classopto_i_c_c_1_1tools_1_1definitions_1_1_device_model.html#aa3cc1ac452f63384ec94edb0c249fbe7',1,'optoICC::tools::definitions::DeviceModel']]]
+];

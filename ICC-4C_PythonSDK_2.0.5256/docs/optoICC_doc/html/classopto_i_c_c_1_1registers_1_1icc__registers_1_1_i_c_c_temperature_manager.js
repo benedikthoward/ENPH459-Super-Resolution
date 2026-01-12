@@ -1,0 +1,25 @@
+var classopto_i_c_c_1_1registers_1_1icc__registers_1_1_i_c_c_temperature_manager =
+[
+    [ "__init__", "classopto_i_c_c_1_1registers_1_1icc__registers_1_1_i_c_c_temperature_manager.html#a38ebb9fd535f808c8f985cc5e6f35c4e", null ],
+    [ "GetDeviceTemperature", "classopto_i_c_c_1_1registers_1_1icc__registers_1_1_i_c_c_temperature_manager.html#a0b22915e6ac86a9f9690555f274497c9", null ],
+    [ "GetDeviceTemperatureThreshold", "classopto_i_c_c_1_1registers_1_1icc__registers_1_1_i_c_c_temperature_manager.html#a374bf3d4e8e41e126639035b08310660", null ],
+    [ "SetDeviceTemperatureThreshold", "classopto_i_c_c_1_1registers_1_1icc__registers_1_1_i_c_c_temperature_manager.html#aebd06a09c1a7162aeeb515a56abc4151", null ],
+    [ "GetBoardOutTemperature", "classopto_i_c_c_1_1registers_1_1icc__registers_1_1_i_c_c_temperature_manager.html#acb55f10e3b05f2898cb50fea7b293f7a", null ],
+    [ "GetBoardOutTemperatureThreshold", "classopto_i_c_c_1_1registers_1_1icc__registers_1_1_i_c_c_temperature_manager.html#ac76c92f05ff7fa01c063daa9ea696ca6", null ],
+    [ "SetBoardOutTemperatureThreshold", "classopto_i_c_c_1_1registers_1_1icc__registers_1_1_i_c_c_temperature_manager.html#ace5414d9b7cb4cc7a7148c93f31a6824", null ],
+    [ "GetBoardPowTemperature", "classopto_i_c_c_1_1registers_1_1icc__registers_1_1_i_c_c_temperature_manager.html#a658030a277ca88c0a54da207e8e21793", null ],
+    [ "GetBoardPowTemperatureThreshold", "classopto_i_c_c_1_1registers_1_1icc__registers_1_1_i_c_c_temperature_manager.html#ac065597ffb7a2d515ed6d1bf62171da9", null ],
+    [ "SetBoardPowTemperatureThreshold", "classopto_i_c_c_1_1registers_1_1icc__registers_1_1_i_c_c_temperature_manager.html#ab4688ec19f367a1a543e6f30bf39d322", null ],
+    [ "GetBoardMcuTemperature", "classopto_i_c_c_1_1registers_1_1icc__registers_1_1_i_c_c_temperature_manager.html#a8daaa545de2f8190510ef701f89d76a8", null ],
+    [ "GetBoardMcuTemperatureThreshold", "classopto_i_c_c_1_1registers_1_1icc__registers_1_1_i_c_c_temperature_manager.html#a54644a2403324bed704d2aa69b41db80", null ],
+    [ "SetBoardMcuTemperatureThreshold", "classopto_i_c_c_1_1registers_1_1icc__registers_1_1_i_c_c_temperature_manager.html#a4e6aad13958871b63bb7ffdf7241d677", null ],
+    [ "sys_id", "classopto_i_c_c_1_1registers_1_1icc__registers_1_1_i_c_c_temperature_manager.html#ace09842ee482169ecdce00486ac7991f", null ],
+    [ "device_temperature", "classopto_i_c_c_1_1registers_1_1icc__registers_1_1_i_c_c_temperature_manager.html#a69589cd50c1a44c72288eaacd3e8e06f", null ],
+    [ "device_temp_threshold", "classopto_i_c_c_1_1registers_1_1icc__registers_1_1_i_c_c_temperature_manager.html#a1ebc9af5adcad7718feead96ab819eed", null ],
+    [ "board_out_temperature", "classopto_i_c_c_1_1registers_1_1icc__registers_1_1_i_c_c_temperature_manager.html#ad1dc275c8df96b722fdeaad459037727", null ],
+    [ "board_out_threshold", "classopto_i_c_c_1_1registers_1_1icc__registers_1_1_i_c_c_temperature_manager.html#adc3e2ee894b3659e3d6d085fdbcc5084", null ],
+    [ "board_pwr_temperature", "classopto_i_c_c_1_1registers_1_1icc__registers_1_1_i_c_c_temperature_manager.html#ab58d8948e0ad3fb4837ef529f7c96804", null ],
+    [ "board_pwr_threshold", "classopto_i_c_c_1_1registers_1_1icc__registers_1_1_i_c_c_temperature_manager.html#a02947a613969d887d1c4b6a1585fad95", null ],
+    [ "board_mcu_temperature", "classopto_i_c_c_1_1registers_1_1icc__registers_1_1_i_c_c_temperature_manager.html#a5ea6f81a10aa9e28fc52ad04b69c57d2", null ],
+    [ "board_mcu_threshold", "classopto_i_c_c_1_1registers_1_1icc__registers_1_1_i_c_c_temperature_manager.html#aaf317af8940cf52bf455401c59804a81", null ]
+];

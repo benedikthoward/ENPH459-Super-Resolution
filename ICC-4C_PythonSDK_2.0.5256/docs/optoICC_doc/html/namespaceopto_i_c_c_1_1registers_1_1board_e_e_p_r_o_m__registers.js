@@ -1,0 +1,6 @@
+var namespaceopto_i_c_c_1_1registers_1_1board_e_e_p_r_o_m__registers =
+[
+    [ "ECC1cBoardEEPROM", "classopto_i_c_c_1_1registers_1_1board_e_e_p_r_o_m__registers_1_1_e_c_c1c_board_e_e_p_r_o_m.html", "classopto_i_c_c_1_1registers_1_1board_e_e_p_r_o_m__registers_1_1_e_c_c1c_board_e_e_p_r_o_m" ],
+    [ "ICC1cBoardEEPROM", "classopto_i_c_c_1_1registers_1_1board_e_e_p_r_o_m__registers_1_1_i_c_c1c_board_e_e_p_r_o_m.html", "classopto_i_c_c_1_1registers_1_1board_e_e_p_r_o_m__registers_1_1_i_c_c1c_board_e_e_p_r_o_m" ],
+    [ "ICC4cBoardEEPROM", "classopto_i_c_c_1_1registers_1_1board_e_e_p_r_o_m__registers_1_1_i_c_c4c_board_e_e_p_r_o_m.html", "classopto_i_c_c_1_1registers_1_1board_e_e_p_r_o_m__registers_1_1_i_c_c4c_board_e_e_p_r_o_m" ]
+];
