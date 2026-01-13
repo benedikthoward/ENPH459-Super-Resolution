@@ -10,6 +10,8 @@ timeout_seconds = 5.0
 [camera]
 # Daheng MER2-302-56U3M/C camera settings
 # Sony IMX265 sensor: 2048x1536 @ 56fps max
+# Device identifier: index (0, 1, 2...) or serial number string
+device = "0"
 resolution = [2048, 1536]
 frame_rate = 56
 # Pixel format: "Mono8" for monochrome, "BayerRG8" for color

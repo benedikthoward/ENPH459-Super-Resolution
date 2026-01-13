@@ -66,6 +66,7 @@ class IPCConfig:
 @dataclass
 class CameraConfig:
     """Camera configuration."""
+    device: str  # Device index ("0", "1") or serial number
     resolution: tuple[int, int]
     frame_rate: int
     pixel_format: str
@@ -125,6 +126,7 @@ class Config:
                 timeout_seconds=ipc_data.get("timeout_seconds", 5.0),
             ),
             camera=CameraConfig(
+                device=str(camera_data.get("device", "0")),
                 resolution=tuple(camera_data.get("resolution", [2048, 1536])),
                 frame_rate=camera_data.get("frame_rate", 56),
                 pixel_format=camera_data.get("pixel_format", "Mono8"),

@@ -39,6 +39,10 @@ impl Default for IpcConfig {
 /// Camera configuration
 #[derive(Debug, Deserialize, Clone)]
 pub struct CameraConfig {
+    /// Device identifier: index ("0", "1") or serial number
+    #[serde(default = "default_device")]
+    pub device: String,
+    
     /// Resolution [width, height]
     #[serde(default = "default_resolution")]
     pub resolution: [u32; 2],
@@ -60,6 +64,10 @@ pub struct CameraConfig {
     pub gain_db: f64,
 }
 
+fn default_device() -> String {
+    "0".to_string()
+}
+
 fn default_resolution() -> [u32; 2] {
     [2048, 1536]
 }
@@ -79,6 +87,7 @@ fn default_exposure() -> u32 {
 impl Default for CameraConfig {
     fn default() -> Self {
         Self {
+            device: default_device(),
             resolution: default_resolution(),
             frame_rate: default_camera_frame_rate(),
             pixel_format: default_pixel_format(),

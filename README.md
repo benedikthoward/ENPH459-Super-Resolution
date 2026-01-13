@@ -186,6 +186,7 @@ socket_path = "/tmp/sr_ipc.sock"
 timeout_seconds = 5.0
 
 [camera]
+device = "0"  # Device index or serial number
 resolution = [2048, 1536]
 frame_rate = 56
 pixel_format = "Mono8"
