@@ -20,7 +20,7 @@ image = "0.25"
 
 # USB3 Vision / GenICam camera support
 # Note: cameleon requires libusb on the system
-cameleon = "0.2"
+cameleon = "0.1.14"
 
 # Error handling
 anyhow = "1"
