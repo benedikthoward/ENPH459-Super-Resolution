@@ -11,9 +11,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Optional
 
-
-# Default socket path
-DEFAULT_SOCKET_PATH = Path("/tmp/sr_ipc.sock")
+from .config import get_config
 
 
 class MessageType(Enum):
@@ -92,29 +90,36 @@ class IPCClient:
         >>> client.disconnect()
     """
     
-    def __init__(self, socket_path: Path = DEFAULT_SOCKET_PATH):
+    def __init__(self, socket_path: Optional[Path] = None):
         """
         Initialize IPC client.
         
         Args:
-            socket_path: Path to Unix domain socket.
+            socket_path: Path to Unix domain socket. If None, uses config.toml setting.
         """
+        if socket_path is None:
+            config = get_config()
+            socket_path = Path(config.ipc.socket_path)
         self._socket_path = socket_path
+        self._timeout = get_config().ipc.timeout_seconds
         self._socket: Optional[socket.socket] = None
         self._is_connected = False
     
-    def connect(self, timeout: float = 5.0) -> None:
+    def connect(self, timeout: Optional[float] = None) -> None:
         """
         Connect to the IPC server.
         
         Args:
-            timeout: Connection timeout in seconds.
+            timeout: Connection timeout in seconds. If None, uses config.toml setting.
             
         Raises:
             ConnectionError: If unable to connect.
         """
         if self._is_connected:
             return
+        
+        if timeout is None:
+            timeout = self._timeout
             
         try:
             self._socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)

@@ -5,35 +5,50 @@
 //! - IPC communication with the Python shifting driver
 //! - Super-resolution image reconstruction
 
+mod config;
 mod ipc;
 
 use anyhow::Result;
-use tracing::{info, Level};
+use tracing::info;
 use tracing_subscriber::FmtSubscriber;
 
-use crate::ipc::{DefaultHandler, IPCServer, DEFAULT_SOCKET_PATH};
+use crate::config::Config;
+use crate::ipc::{DefaultHandler, IPCServer};
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    // Initialize logging
+    // Load configuration
+    let config = Config::load().unwrap_or_else(|e| {
+        eprintln!("Warning: Could not load config.toml: {}. Using defaults.", e);
+        Config::default()
+    });
+    
+    // Initialize logging with configured level
     let subscriber = FmtSubscriber::builder()
-        .with_max_level(Level::DEBUG)
+        .with_max_level(config.log_level())
         .with_target(false)
         .init();
 
     info!("Super Resolution Image Processing Server");
     info!("=========================================");
+    info!("Configuration:");
+    info!("  Socket: {}", config.ipc.socket_path);
+    info!("  Camera: {}x{} @ {}fps", 
+        config.camera.resolution[0], 
+        config.camera.resolution[1],
+        config.camera.frame_rate
+    );
+    info!("  Log level: {}", config.output.log_level);
 
-    // Create and start IPC server
-    let mut server = IPCServer::new(DEFAULT_SOCKET_PATH);
+    // Create and start IPC server with configured socket path
+    let mut server = IPCServer::new(&config.ipc.socket_path);
     server.start().await?;
 
     // Use default handler for now
-    // TODO: Replace with actual camera/processing handler
+    // TODO: Replace with actual camera/processing handler that uses config.camera
     let handler = DefaultHandler::default();
     
     info!("Server ready. Waiting for connections...");
-    info!("Socket: {}", DEFAULT_SOCKET_PATH);
     
     // Run server (blocks forever)
     server.run(handler).await?;

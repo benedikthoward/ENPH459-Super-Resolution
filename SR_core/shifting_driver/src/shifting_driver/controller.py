@@ -11,6 +11,8 @@ from typing import Optional
 
 from optoICC import connect
 
+from .config import get_config
+
 
 class WaveformShape(Enum):
     """Beam shifting waveform patterns."""
@@ -45,22 +47,31 @@ class BeamShifterController:
         >>> ctrl.stop()
     """
     
-    DEFAULT_CHANNEL = 0
-    DEFAULT_FRAME_RATE = 60
-    
-    def __init__(self, port: Optional[str] = None, channel: int = DEFAULT_CHANNEL):
+    def __init__(self, port: Optional[str] = None, channel: Optional[int] = None):
         """
         Initialize connection to the ICC-4C controller.
         
         Args:
-            port: Serial port for ICC-4C. If None, auto-detect.
+            port: Serial port for ICC-4C. If None, uses config.toml setting
+                  or auto-detect if config is empty.
                   Examples: '/dev/cu.usbserial-xxx' (macOS),
                            '/dev/ttyUSB0' (Linux), 'COM3' (Windows)
             channel: Active channel for XRP control (0, 1, or 2).
+                     If None, uses config.toml setting.
                      XRP devices use channel pairs, so channel 0 uses 0-1.
         """
+        config = get_config()
+        
+        # Use config values if not explicitly provided
+        if port is None:
+            port = config.beam_shifter.port  # May be None for auto-detect
+        if channel is None:
+            channel = config.beam_shifter.channel
+            
         self._port = port
         self._channel = channel
+        self._default_frame_rate = config.beam_shifter.default_frame_rate
+        self._default_waveform = config.beam_shifter.default_waveform
         self._board = None
         self._xpr_control = None
         self._is_connected = False

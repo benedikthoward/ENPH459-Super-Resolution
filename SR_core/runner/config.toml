@@ -1,0 +1,38 @@
+# ENPH459 Super Resolution - Configuration
+# This file is shared between the Python shifting driver and Rust image processor.
+
+[ipc]
+# Unix domain socket for communication between Python and Rust
+socket_path = "/tmp/sr_ipc.sock"
+# Connection timeout in seconds
+timeout_seconds = 5.0
+
+[camera]
+# Daheng MER2-302-56U3M/C camera settings
+# Sony IMX265 sensor: 2048x1536 @ 56fps max
+resolution = [2048, 1536]
+frame_rate = 56
+# Pixel format: "Mono8" for monochrome, "BayerRG8" for color
+pixel_format = "Mono8"
+# Exposure time in microseconds
+exposure_us = 10000
+# Gain in dB
+gain_db = 0.0
+
+[beam_shifter]
+# Optotune XRP-20 beam shifter defaults
+# Frame rate in Hz (must be supported by device, typically 50/60/90/100/120)
+default_frame_rate = 60
+# Waveform pattern: "manhattan" (square) or "diamond"
+default_waveform = "manhattan"
+# ICC-4C channel for XRP control (0, 1, or 2)
+channel = 0
+# Serial port (leave empty for auto-detection)
+# Examples: "/dev/cu.usbserial-xxx" (macOS), "/dev/ttyUSB0" (Linux)
+port = ""
+
+[output]
+# Directory for captured frames (relative to project root)
+image_dir = "./output/frames"
+# Log level: "debug", "info", "warn", "error"
+log_level = "info"

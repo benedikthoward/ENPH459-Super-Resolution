@@ -61,15 +61,6 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 sudo apt install libusb-1.0-0-dev
 ```
 
-### Windows
-
-```powershell
-# Install uv
-powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-
-# Install Rust from https://rustup.rs
-```
-
 ## Quick Start
 
 ```bash
@@ -80,13 +71,17 @@ cd ENPH459-Super-Resolution
 # Install all Python dependencies (creates .venv automatically)
 uv sync
 
+# Launch the full system (Rust server + Python driver)
+uv run python SR_core/runner/launch.py
+
+# Or run components individually:
 # Run prototyping scripts
 uv run --package sr-prototyping python SR_prototyping/scripts/example.py
 
-# Run shifting driver
+# Run shifting driver only
 uv run --package shifting-driver python -m shifting_driver
 
-# Build Rust image processor
+# Build Rust image processor only
 cd SR_core/image_processing
 cargo build --release
 ```
@@ -104,6 +99,9 @@ ENPH459-Super-Resolution/
 │   ├── scripts/                # Experiment scripts
 │   └── resources/              # Test images, media
 └── SR_core/                    # Production system
+    ├── runner/                 # Launcher and shared config
+    │   ├── config.toml         # Shared configuration
+    │   └── launch.py           # System launcher script
     ├── shifting_driver/        # Python: Optotune control + IPC client
     │   ├── pyproject.toml
     │   └── src/shifting_driver/
@@ -157,6 +155,54 @@ cd SR_core/image_processing
 cargo run --release
 ```
 
+### Running the Full System
+
+Use the launcher script to start both components:
+
+```bash
+# Start full system (Rust server + Python driver)
+uv run python SR_core/runner/launch.py
+
+# Start only the Rust server
+uv run python SR_core/runner/launch.py --rust-only
+
+# Start only the Python driver
+uv run python SR_core/runner/launch.py --python-only
+
+# Dry run (show what would be executed)
+uv run python SR_core/runner/launch.py --dry-run
+
+# Use a custom config file
+uv run python SR_core/runner/launch.py --config /path/to/config.toml
+```
+
+## Configuration
+
+Shared configuration is stored in `SR_core/runner/config.toml`:
+
+```toml
+[ipc]
+socket_path = "/tmp/sr_ipc.sock"
+timeout_seconds = 5.0
+
+[camera]
+resolution = [2048, 1536]
+frame_rate = 56
+pixel_format = "Mono8"
+exposure_us = 10000
+gain_db = 0.0
+
+[beam_shifter]
+default_frame_rate = 60
+default_waveform = "manhattan"
+channel = 0
+port = ""  # Empty for auto-detection
+
+[output]
+image_dir = "./output/frames"
+log_level = "info"
+```
+
 ## IPC Protocol
 
 The Python shifting driver and Rust image processor communicate via Unix domain socket (`/tmp/sr_ipc.sock`) using JSON messages:
@@ -175,7 +221,3 @@ The Python shifting driver and Rust image processor communicate via Unix domain 
 {"type": "capture_complete", "frame_ids": [1, 2, 3, 4]}
 {"type": "error", "message": "Camera not connected"}
 ```
-
-## License
-
-[Add license information]
