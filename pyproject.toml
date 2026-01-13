@@ -1,0 +1,16 @@
+[project]
+name = "enph459-super-resolution"
+version = "0.1.0"
+description = "UBC Engineering Physics capstone: barcode decoding improvements using Optotune beam shifted images"
+readme = "README.md"
+requires-python = ">=3.12"
+
+[tool.uv.workspace]
+members = [
+    "SR_prototyping",
+    "SR_core/shifting_driver",
+]
+
+[tool.uv.sources]
+optoicc = { path = "opt_materials/ICC-4C_PythonSDK_2.0.5256/optoicc-2.0.5256-py3-none-any.whl" }
+optokummenberg = { path = "opt_materials/ICC-4C_PythonSDK_2.0.5256/optokummenberg-1.0.5256-py3-none-any.whl" }

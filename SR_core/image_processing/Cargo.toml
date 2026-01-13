@@ -1,0 +1,28 @@
+[package]
+name = "image_processing"
+version = "0.1.0"
+edition = "2024"
+description = "Camera capture and super-resolution image processing"
+
+[dependencies]
+# Async runtime
+tokio = { version = "1", features = ["full"] }
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# Image processing
+image = "0.25"
+
+# USB3 Vision / GenICam camera support
+# Note: cameleon requires libusb on the system
+cameleon = "0.2"
+
+# Error handling
+anyhow = "1"
+thiserror = "1"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
