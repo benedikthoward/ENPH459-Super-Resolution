@@ -1,0 +1,34 @@
+# Zaber Motion Stage Configuration
+# For sample positioning and motion blur simulation
+
+stage:
+  name: "Zaber Linear Stage"
+  # Serial port for connection
+  port: "/dev/tty.usbserial-A4017DXH"
+  # Axis index (1-based as per Zaber convention)
+  axis: 1
+
+# Motion parameters
+motion:
+  # Maximum velocity in mm/s
+  max_velocity_mm_s: 100.0
+  # Typical sample velocity for motion blur testing
+  test_velocity_mm_s: 10.0
+  # Acceleration in mm/s^2
+  acceleration_mm_s2: 500.0
+
+# Position limits
+limits:
+  # Travel range in mm
+  min_position_mm: 0.0
+  max_position_mm: 50.0
+  # Home position
+  home_position_mm: 0.0
+
+# For forward model simulation
+simulation:
+  # Stage position relative to optical axis (x, y, z)
+  # z is along optical axis (object distance)
+  position_mm: [0.0, 0.0, 100.0]
+  # Velocity vector during exposure (for motion blur)
+  velocity_mm_s: [0.0, 0.0, 0.0]

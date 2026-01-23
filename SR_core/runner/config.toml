@@ -33,6 +33,14 @@ channel = 0
 # Examples: "/dev/cu.usbserial-xxx" (macOS), "/dev/ttyUSB0" (Linux)
 port = ""
 
+[stage]
+# Zaber motion stage for sample positioning
+# Serial port (leave empty if not using stage)
+# Examples: "/dev/tty.usbserial-xxx" (macOS), "/dev/ttyUSB0" (Linux), "COM3" (Windows)
+port = ""
+# Axis number to control
+axis = 1
+
 [output]
 # Directory for captured frames (relative to project root)
 image_dir = "./output/frames"

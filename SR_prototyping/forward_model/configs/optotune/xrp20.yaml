@@ -1,0 +1,87 @@
+# Optotune XRP-20 Beam Shifter Configuration
+# Controlled by ICC-4C controller
+
+optotune:
+  name: "XRP-20"
+  # Plate thickness in mm
+  plate_thickness_mm: 2.0
+  # Refractive index of the plate (BK7 glass typical)
+  refractive_index: 1.517
+  # Clear aperture in mm
+  clear_aperture_mm: 20.0
+  # Placement in optical path: "converging" (after lens) or "collimated" (before lens)
+  placement: "converging"
+
+# Tilt range and resolution
+tilt:
+  # Maximum tilt angle in degrees
+  max_tilt_deg: 2.5
+  # Minimum step size in degrees (approximate)
+  resolution_deg: 0.001
+  # Typical operating range for SR
+  typical_amplitude_deg: 0.5
+
+# Controller settings (ICC-4C)
+controller:
+  # Frame rate in Hz (how fast tilts can cycle)
+  frame_rate_hz: 2500
+  # Default waveform shape
+  waveform: "manhattan"
+  # Available waveforms
+  available_waveforms:
+    - "manhattan"  # Square wave (X,Y alternate)
+    - "diamond"    # Diagonal pattern
+    - "custom"     # User-defined pattern
+
+# Shift patterns for super-resolution
+shift_patterns:
+  # 2x2 Manhattan pattern (4 positions)
+  manhattan_2x2:
+    description: "4-point grid for 2x SR"
+    positions:
+      - [0.0, 0.0]
+      - [0.5, 0.0]
+      - [0.0, 0.5]
+      - [0.5, 0.5]
+    
+  # 3x3 grid (9 positions)
+  grid_3x3:
+    description: "9-point grid for 3x SR"
+    positions:
+      - [-0.5, -0.5]
+      - [0.0, -0.5]
+      - [0.5, -0.5]
+      - [-0.5, 0.0]
+      - [0.0, 0.0]
+      - [0.5, 0.0]
+      - [-0.5, 0.5]
+      - [0.0, 0.5]
+      - [0.5, 0.5]
+
+  # Diamond pattern (4 positions)
+  diamond_4:
+    description: "4-point diamond for 2x SR"
+    positions:
+      - [0.0, 0.0]
+      - [0.5, 0.0]
+      - [0.0, 0.5]
+      - [-0.5, 0.0]
+
+# Calibration data (optional, for residual warp correction)
+calibration:
+  enabled: false
+  # Polynomial order for residual warp
+  polynomial_order: 3
+  # Coefficients would be stored here after calibration
+  coeffs_x: []
+  coeffs_y: []
+
+# Physical model parameters
+# Used for computing expected shifts from tilt angles
+physics:
+  # Snell's law: Delta = t * sin(theta) * (1 - sqrt((1-sin^2(theta))/(n^2-sin^2(theta))))
+  # At small angles: Delta ≈ t * theta * (n-1)/n
+  
+  # Expected shift per degree of tilt (approximate, mm)
+  # For t=2mm, n=1.517: ~0.7mm per degree at small angles
+  shift_per_degree_mm: 0.68

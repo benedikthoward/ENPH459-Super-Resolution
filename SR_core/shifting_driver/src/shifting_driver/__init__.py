@@ -1,18 +1,28 @@
 """
-Optotune ICC-4C / XRP-20 Beam Shifter Control Driver
+Super Resolution Hardware Control Driver
 
-This module provides control over the Optotune beam shifter system for
-super-resolution imaging applications.
+This module provides control over:
+- Optotune ICC-4C / XRP-20 beam shifter
+- Zaber motion stages for sample positioning
+
+Used for super-resolution imaging applications.
 """
 
 from .config import Config, get_config, reload_config
 from .controller import BeamShifterController, WaveformShape
 from .ipc import IPCClient
+from .stage import StageController, StagePosition
 
 __all__ = [
+    # Beam shifter
     "BeamShifterController",
     "WaveformShape",
+    # Stage
+    "StageController",
+    "StagePosition",
+    # IPC
     "IPCClient",
+    # Config
     "Config",
     "get_config",
     "reload_config",

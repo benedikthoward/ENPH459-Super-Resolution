@@ -84,6 +84,13 @@ class BeamShifterConfig:
 
 
 @dataclass
+class StageConfig:
+    """Zaber stage configuration."""
+    port: Optional[str]
+    axis: int
+
+
+@dataclass
 class OutputConfig:
     """Output configuration."""
     image_dir: str
@@ -96,6 +103,7 @@ class Config:
     ipc: IPCConfig
     camera: CameraConfig
     beam_shifter: BeamShifterConfig
+    stage: StageConfig
     output: OutputConfig
     
     @classmethod
@@ -118,6 +126,7 @@ class Config:
         ipc_data = data.get("ipc", {})
         camera_data = data.get("camera", {})
         shifter_data = data.get("beam_shifter", {})
+        stage_data = data.get("stage", {})
         output_data = data.get("output", {})
         
         return cls(
@@ -138,6 +147,10 @@ class Config:
                 default_waveform=shifter_data.get("default_waveform", "manhattan"),
                 channel=shifter_data.get("channel", 0),
                 port=shifter_data.get("port") or None,
+            ),
+            stage=StageConfig(
+                port=stage_data.get("port") or None,
+                axis=stage_data.get("axis", 1),
             ),
             output=OutputConfig(
                 image_dir=output_data.get("image_dir", "./output/frames"),

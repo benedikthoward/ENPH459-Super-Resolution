@@ -7,6 +7,7 @@ requires-python = ">=3.12"
 dependencies = [
     "optoicc",
     "optokummenberg",
+    "zaber-motion",
 ]
 
 [tool.uv.workspace]

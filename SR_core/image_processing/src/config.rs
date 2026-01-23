@@ -136,6 +136,31 @@ impl Default for BeamShifterConfig {
     }
 }
 
+/// Zaber stage configuration
+#[derive(Debug, Deserialize, Clone)]
+pub struct StageConfig {
+    /// Serial port (empty for none)
+    #[serde(default)]
+    pub port: String,
+    
+    /// Axis number
+    #[serde(default = "default_axis")]
+    pub axis: u32,
+}
+
+fn default_axis() -> u32 {
+    1
+}
+
+impl Default for StageConfig {
+    fn default() -> Self {
+        Self {
+            port: String::new(),
+            axis: default_axis(),
+        }
+    }
+}
+
 /// Output configuration
 #[derive(Debug, Deserialize, Clone)]
 pub struct OutputConfig {
@@ -176,6 +201,9 @@ pub struct Config {
     
     #[serde(default)]
     pub beam_shifter: BeamShifterConfig,
+    
+    #[serde(default)]
+    pub stage: StageConfig,
     
     #[serde(default)]
     pub output: OutputConfig,

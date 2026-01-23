@@ -1,0 +1,57 @@
+# Default Lens Configuration
+# Generic C-mount industrial lens parameters
+
+lens:
+  name: "Generic 25mm C-mount"
+  # Focal length in mm
+  focal_length_mm: 25.0
+  # F-number (minimum, wide open)
+  f_number: 2.8
+  # Working f-number (typical operational setting)
+  working_f_number: 4.0
+  # Primary wavelength for diffraction calculations (nm)
+  wavelength_nm: 550
+  # Mount type
+  mount: "C-mount"
+  # Flange distance (mm)
+  flange_distance_mm: 17.526
+
+# Object space configuration
+object_space:
+  # Working distance (object to lens front) in mm
+  working_distance_mm: 100
+  # This gives magnification around 0.25x for typical setup
+  
+# PSF mode for simulation
+psf:
+  # Mode: "diffraction", "gaussian", or "zernike"
+  mode: "diffraction"
+  # Defocus in waves (0 for perfect focus)
+  defocus_waves: 0.0
+
+# Optional Zernike aberration coefficients (Noll indices)
+# Only used when psf.mode = "zernike"
+zernike_coeffs:
+  # 4: defocus
+  4: 0.0
+  # 5, 6: astigmatism
+  5: 0.0
+  6: 0.0
+  # 7, 8: coma
+  7: 0.0
+  8: 0.0
+  # 11: spherical
+  11: 0.0
+
+# Computed properties (for reference)
+# These are calculated from the above parameters
+computed:
+  # Image distance from thin lens equation
+  # d_i = f * d_o / (d_o - f) ≈ 33.3mm for d_o=100, f=25
+  image_distance_mm: 33.33
+  # Magnification = d_i / d_o ≈ 0.33
+  magnification: 0.333
+  # Diffraction-limited Airy disk diameter (um) = 2.44 * lambda * f/#
+  airy_disk_um: 3.76
+  # FWHM of diffraction spot (um) ≈ 1.03 * lambda * f/#
+  fwhm_um: 1.58

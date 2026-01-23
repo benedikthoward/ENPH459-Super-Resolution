@@ -1,0 +1,60 @@
+# Sony IMX265 CMOS Sensor Configuration
+# Used in Daheng MER2-302-56U3M/C camera
+
+sensor:
+  name: "Sony IMX265"
+  # Resolution (width x height pixels)
+  resolution: [2048, 1536]
+  # Pixel pitch in micrometers
+  pixel_pitch_um: 3.45
+  # Bit depth of ADC
+  bit_depth: 12
+  # Full well capacity in electrons
+  full_well_e: 10500
+  # Read noise in electrons (RMS)
+  read_noise_e: 2.5
+  # Dark current in electrons per second (at 25°C)
+  dark_current_e_per_s: 0.5
+  # Quantum efficiency (peak, around 550nm)
+  qe: 0.70
+  # Pixel fill factor
+  fill_factor: 1.0
+  # Sensor type
+  type: "CMOS"
+  # Color filter array (null for monochrome)
+  cfa: null
+
+# Exposure settings (defaults)
+exposure:
+  # Exposure time in seconds
+  time_s: 0.001
+  # Analog gain (1.0 = unity)
+  gain: 1.0
+  # Black level offset in DN
+  black_level_dn: 64
+
+# ADC configuration
+adc:
+  # Bit depth (should match sensor)
+  bit_depth: 12
+  # Conversion gain (DN per electron)
+  # Calibrated to map full_well to ~95% of full scale
+  gain: 0.38
+  # Black level
+  black_level_dn: 64
+
+# Noise parameters (derived from sensor specs)
+noise:
+  # These are computed from sensor specs but can be overridden
+  read_noise_e: 2.5
+  dark_current_e_per_s: 0.5
+  # Fixed pattern noise as percentage of signal
+  fixed_pattern_noise_percent: 0.5
+  quantum_efficiency: 0.70
+
+# Frame rate capabilities
+timing:
+  # Maximum frame rate at full resolution
+  max_fps_full: 56
+  # Interface
+  interface: "USB3 Vision"
