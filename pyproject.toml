@@ -5,9 +5,21 @@ description = "UBC Engineering Physics capstone: barcode decoding improvements u
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "numpy",
+    "opencv-python",
+    "optocontrollertoolbox",
     "optoicc",
     "optokummenberg",
+    "pypylon",
+    "pyqt5",
     "zaber-motion",
+]
+
+[tool.uv]
+override-dependencies = [
+    # optoControllerToolbox declares a dependency on optoICCrnd (R&D name),
+    # but the actual code uses optoICC which we provide. Remove the phantom dependency.
+    "optoiccrnd>=0; python_version < '0'",
 ]
 
 [tool.uv.workspace]
@@ -19,3 +31,4 @@ members = [
 [tool.uv.sources]
 optoicc = { path = "opt_materials/ICC-4C_PythonSDK_2.0.5256/optoicc-2.0.5256-py3-none-any.whl" }
 optokummenberg = { path = "opt_materials/ICC-4C_PythonSDK_2.0.5256/optokummenberg-1.0.5256-py3-none-any.whl" }
+optocontrollertoolbox = { path = "opt_materials/optoControllerToolbox-1.0.5100-py3-none-any.whl" }
