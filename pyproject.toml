@@ -31,4 +31,4 @@ members = [
 [tool.uv.sources]
 optoicc = { path = "opt_materials/ICC-4C_PythonSDK_2.0.5256/optoicc-2.0.5256-py3-none-any.whl" }
 optokummenberg = { path = "opt_materials/ICC-4C_PythonSDK_2.0.5256/optokummenberg-1.0.5256-py3-none-any.whl" }
-optocontrollertoolbox = { path = "opt_materials/optoControllerToolbox-1.0.5100-py3-none-any.whl" }
+optocontrollertoolbox = { path = "opt_materials/software/optoControllerToolbox-1.0.5100-py3-none-any.whl" }
