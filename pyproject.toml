@@ -6,14 +6,13 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "numpy",
-    "opencv-python",
+    "opencv-python-headless",
     "optocontrollertoolbox",
     "optoicc",
     "optokummenberg",
     "pypylon",
     "pyqt5",
     "zaber-motion",
-    "opencv-python",
     "iai-gxipy",
 ]
 
@@ -22,9 +21,9 @@ override-dependencies = [
     # optoControllerToolbox declares a dependency on optoICCrnd (R&D name),
     # but the actual code uses optoICC which we provide. Remove the phantom dependency.
     "optoiccrnd>=0; python_version < '0'",
-    # optoKummenberg uses old bitstring API (integer auto-init) removed in 4.2+.
-    # Pin to 4.1.x for compatibility.
-    "bitstring>=4.1,<4.2",
+    # optoKummenberg/eeprom use old bitstring API (integer auto-init) removed in 4.0.
+    # Pin to 3.x for compatibility.
+    "bitstring<4",
 ]
 
 [tool.uv.workspace]

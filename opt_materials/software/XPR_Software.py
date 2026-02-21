@@ -655,7 +655,7 @@ class Window(QMainWindow, Ui_MainWindow):
             cam.Gain.set(value)
 
     def setAutoWhiteBalance(self):
-        if cameraType == DAHENG:
+        if cameraType == DAHENG and cam.BalanceWhiteAuto.is_writable():
             cam.BalanceWhiteAuto.set(2)
 
     def setAutoExposure(self):
