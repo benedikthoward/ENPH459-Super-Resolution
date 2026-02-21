@@ -76,9 +76,10 @@ FPS = 0
 FPS2 = 0
 FPS_n = 0.1
 mutex = QMutex()
-cameraType = 0  # 0: DAHENG Color Camera, 1: BASLER Mono Camera
+cameraType = 0  # 0: DAHENG Color Camera, 1: BASLER Mono Camera, 2: DAHENG Mono Camera
 DAHENG = 0
 BASLER = 1
+DAHENG_MONO = 2
 frame_number = 0
 RGB = 0  # 0:RGB - 1:R - 2:G - 3:B
 R = 1
@@ -143,9 +144,18 @@ except:
         # Start acquisition
         cam.stream_on()
 
-    tilt_angle = 0.14391  # +/- half pixel shift for 3.45um pixels
-   #tilt_angle = 0.1
-    cameraType = DAHENG
+    # Detect mono vs colour by checking pixel colour filter.
+    # On mono cameras PixelColorFilter is not readable — treat that as mono.
+    try:
+        is_colour = cam.PixelColorFilter.get() != gx.GxPixelColorFilterEntry.NONE
+    except Exception:
+        is_colour = False
+    if is_colour:
+        cameraType = DAHENG
+        tilt_angle = 0.14391  # +/- one pixel shift for 3.45um Bayer pixels
+    else:
+        cameraType = DAHENG_MONO
+        tilt_angle = 0.14391  # / 2  # +/- half pixel shift for 3.45um mono pixels
     h = cam.Height.get()
     w = cam.Width.get()
 
@@ -163,13 +173,14 @@ M2 = np.float32([[1, 0, -tilt], [0, 1, tilt]])
 M3 = np.float32([[1, 0, -tilt], [0, 1, 0]])
 M.extend((M0, M1, M2, M3))
 
-# Depends on the Bayer pattern of the camera
-masktile_R = np.array([[True, False], [False, False]])
-mask_R = np.tile(masktile_R, (h // 2, w // 2))
-masktile_G = np.array([[False, True], [True, False]])
-mask_G = np.tile(masktile_G, (h // 2, w // 2))
-masktile_B = np.array([[False, False], [False, True]])
-mask_B = np.tile(masktile_B, (h // 2, w // 2))
+# Bayer channel masks — only needed for the colour Daheng path
+if cameraType == DAHENG:
+    masktile_R = np.array([[True, False], [False, False]])
+    mask_R = np.tile(masktile_R, (h // 2, w // 2))
+    masktile_G = np.array([[False, True], [True, False]])
+    mask_G = np.tile(masktile_G, (h // 2, w // 2))
+    masktile_B = np.array([[False, False], [False, True]])
+    mask_B = np.tile(masktile_B, (h // 2, w // 2))
 
 ROI_height = h // 8
 ROI_width = w // 8
@@ -232,11 +243,15 @@ class Runnable_Full_Cam(QRunnable):
                 raw_image = grab.GetArray()
                 frame = cv2.cvtColor(raw_image,
                                      cv2.COLOR_GRAY2RGB)  # makes manipulation for monochrome and color the same
-            else: # Daheng
+            elif cameraType == DAHENG:
                 cam.TriggerSoftware.send_command()
                 raw_image = cam.data_stream[0].get_image()
-                rgb_image = raw_image.convert("RGB", convert_type=0)
+                rgb_image = raw_image.convert("RGB", convert_type=0)  # Bayer demosaic
                 frame = rgb_image.get_numpy_array()
+            else:  # DAHENG_MONO
+                cam.TriggerSoftware.send_command()
+                raw_image = cam.data_stream[0].get_image()
+                frame = cv2.cvtColor(raw_image.get_numpy_array(), cv2.COLOR_GRAY2RGB)
 
             bytesPerLine = 3 * w
 
@@ -272,7 +287,7 @@ class Runnable_Full_Cam(QRunnable):
                 # cam_zoom image only shows frame 0, to avoid any image shifts
 
                 mutex.lock()
-                if np.array_equal(color_comparison, WHITE) or cameraType == BASLER:
+                if np.array_equal(color_comparison, WHITE) or cameraType in (BASLER, DAHENG_MONO):
                     frameZoom_resized_send = frameZoom_resized.copy()
 
                 elif np.array_equal(color_comparison, REDBLUE):
@@ -320,7 +335,36 @@ class Runnable_Full_Cam(QRunnable):
 
             if XPR_on:
                 # Algorithm creating HR image according color or mono camera
-                if cameraType == DAHENG:
+                if cameraType == DAHENG_MONO:
+                    frame_raw = raw_image.get_numpy_array()  # H×W grayscale
+                    height, width = frame_raw[py1: py2, px1: px2].shape
+
+                    mutex.lock()
+                    if frame_CamXPR_numpy.shape[0] != 2 * height or frame_CamXPR_numpy.shape[
+                            1] != 2 * width or frame_number == 0:
+                        frame_CamXPR_numpy = np.zeros((2 * height, 2 * width, n_images), dtype=np.uint8)
+                    mutex.unlock()
+
+                    frame_CamXPR_numpy[::2, ::2, frame_number] = frame_raw[py1: py2, px1: px2]
+                    frame_CamXPR_numpy[:, :, frame_number] = cv2.warpAffine(
+                        frame_CamXPR_numpy[:, :, frame_number], M[frame_number],
+                        (2 * width, 2 * height), borderMode=cv2.BORDER_REFLECT_101)
+
+                    if frame_number == n_images - 1:
+                        frame_CamXPR_numpy_HR = np.sum(frame_CamXPR_numpy, axis=2, dtype=np.uint8)
+                        frame_CamXPR = QImage.scaled(
+                            QImage(frame_CamXPR_numpy_HR.data, frame_CamXPR_numpy_HR.shape[1],
+                                   frame_CamXPR_numpy_HR.shape[0],
+                                   frame_CamXPR_numpy_HR.shape[1], QImage.Format.Format_Grayscale8),
+                            size, transformMode=Qt.FastTransformation)
+                        win.updatedCamXPR.emit()
+
+                    mutex.lock()
+                    if XPR_on:
+                        frame_number = (frame_number + 1) % n_images
+                    mutex.unlock()
+
+                elif cameraType == DAHENG:
                     frame_raw = raw_image.get_numpy_array()
                     height, width = frame_raw[py1: py2, px1: px2].shape
 
@@ -522,6 +566,22 @@ class Window(QMainWindow, Ui_MainWindow):
             self.radioButton_Normal.hide()
             self.radioButton_Interpolated.hide()
 
+        elif cameraType == DAHENG_MONO:
+            self.TitleImage.setText("Monochrome Camera (Daheng)")
+            self.ButtonWBalance.hide()
+
+            self.TitleChannel.hide()
+            self.radioButton_RGB.hide()
+            self.radioButton_R.hide()
+            self.radioButton_G.hide()
+            self.radioButton_B.hide()
+
+            self.TitleHighlight.hide()
+            self.radioButtonNormal.hide()
+            self.radioButtonRed.hide()
+            self.radioButtonBlue.hide()
+            self.radioButtonRedBlue.hide()
+
         self.CamImage.mousePressEvent = self.getPos
 
     def start_capture(self):
@@ -659,7 +719,7 @@ class Window(QMainWindow, Ui_MainWindow):
             cam.BalanceWhiteAuto.set(2)
 
     def setAutoExposure(self):
-        if cameraType == DAHENG:
+        if cameraType in (DAHENG, DAHENG_MONO):
             cam.ExposureAuto.set(2)
             time.sleep(1)
             value = int(cam.ExposureTime.get())
