@@ -22,6 +22,9 @@ override-dependencies = [
     # optoControllerToolbox declares a dependency on optoICCrnd (R&D name),
     # but the actual code uses optoICC which we provide. Remove the phantom dependency.
     "optoiccrnd>=0; python_version < '0'",
+    # optoKummenberg uses old bitstring API (integer auto-init) removed in 4.2+.
+    # Pin to 4.1.x for compatibility.
+    "bitstring>=4.1,<4.2",
 ]
 
 [tool.uv.workspace]
