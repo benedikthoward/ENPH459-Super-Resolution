@@ -17,9 +17,10 @@ from optoControllerToolbox.SmartFilter import SmartFilters
 import ctypes
 
 
-# This is done to use the XPR logo as taskbar image
-myappid = 'string'  # arbitrary string
-ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+# This is done to use the XPR logo as taskbar image (Windows only)
+if sys.platform == 'win32':
+    myappid = 'string'  # arbitrary string
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
 # XPR init
 # Restarting step (as to be done due to filter set step, need a power cycle)
@@ -181,8 +182,16 @@ ROI_posy_max = h - ROI_height // 2 - w_line
 ROI_center_x = w // 2
 ROI_center_y = h // 2
 
-user32 = ctypes.windll.user32
-screensize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
+if sys.platform == 'win32':
+    user32 = ctypes.windll.user32
+    screensize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
+else:
+    from PyQt5.QtWidgets import QApplication
+    screen = QApplication.primaryScreen() if QApplication.instance() else None
+    if screen:
+        screensize = screen.size().width(), screen.size().height()
+    else:
+        screensize = (1920, 1080)
 size_h_max = int(screensize[1]*0.4)  # makes sure that pictures fit on screen
 resize_factor = h / size_h_max
 
