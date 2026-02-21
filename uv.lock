@@ -302,7 +302,7 @@ dependencies = [
 requires-dist = [
     { name = "numpy" },
     { name = "opencv-python" },
-    { name = "optocontrollertoolbox", path = "opt_materials/optoControllerToolbox-1.0.5100-py3-none-any.whl" },
+    { name = "optocontrollertoolbox", path = "opt_materials/software/optoControllerToolbox-1.0.5100-py3-none-any.whl" },
     { name = "optoicc", path = "opt_materials/ICC-4C_PythonSDK_2.0.5256/optoicc-2.0.5256-py3-none-any.whl" },
     { name = "optokummenberg", path = "opt_materials/ICC-4C_PythonSDK_2.0.5256/optokummenberg-1.0.5256-py3-none-any.whl" },
     { name = "pypylon" },
@@ -614,7 +614,7 @@ wheels = [
 [[package]]
 name = "optocontrollertoolbox"
 version = "1.0.5100"
-source = { path = "opt_materials/optoControllerToolbox-1.0.5100-py3-none-any.whl" }
+source = { path = "opt_materials/software/optoControllerToolbox-1.0.5100-py3-none-any.whl" }
 dependencies = [
     { name = "bitstring" },
     { name = "control" },

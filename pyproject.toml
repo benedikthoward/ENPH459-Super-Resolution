@@ -13,6 +13,7 @@ dependencies = [
     "pypylon",
     "pyqt5",
     "zaber-motion",
+    "opencv-python",
 ]
 
 [tool.uv]
