@@ -36,14 +36,14 @@ connected_devices = [optoICC.DeviceModel(icc4c.MiscFeatures.GetDeviceType(0)),
 ch_0 = icc4c.channel[0]
 ch_0.StaticInput.SetAsInput()  # (1) here we tell the Manager that we will use a static input
 ch_0.InputConditioning.SetGain(1.0)  # (2) here we tell the Manager some input conditioning parameters
-ch_0.SetControlMode(optoICC.Units.UNITLESS)  # (3) here we tell the Manager that our input will be in units of degrees
+ch_0.SetControlMode(optoICC.UnitType.UNITLESS)  # (3) here we tell the Manager that our input will be in units of degrees
 # ch_0.LinearOutput.SetCurrentLimit(0.6)  #(4) here we tell the Manager to limit the current to 600mA (default)
 #ch_0.Manager.CheckSignalFlow()  # This is a useful method to make sure the signal flow is configured correctly.
 
 ch_1 = icc4c.channel[1]
 ch_1.StaticInput.SetAsInput()  # (1) here we tell the Manager that we will use a static input
 ch_1.InputConditioning.SetGain(1.0)  # (2) here we tell the Manager some input conditioning parameters
-ch_1.SetControlMode(optoICC.Units.UNITLESS)  # (3) here we tell the Manager that our input will be in units of degrees
+ch_1.SetControlMode(optoICC.UnitType.UNITLESS)  # (3) here we tell the Manager that our input will be in units of degrees
 # ch_1.LinearOutput.SetCurrentLimit(0.6)  #(4) here we tell the Manager to limit the current to 600mA (default)
 #ch_1.Manager.CheckSignalFlow()  # This is a useful method to make sure the signal flow is configured correctly.
 
