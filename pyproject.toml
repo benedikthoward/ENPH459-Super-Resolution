@@ -14,6 +14,7 @@ dependencies = [
     "pyqt5",
     "zaber-motion",
     "opencv-python",
+    "iai-gxipy",
 ]
 
 [tool.uv]
