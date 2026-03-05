@@ -5,6 +5,8 @@ import time
 import optoICC
 import sys
 import numpy as np
+from datetime import datetime
+from pathlib import Path
 import gxipy as gx # Daheng SDK
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -98,6 +100,32 @@ color_comparison = WHITE
 min_color_similarity = 145  # 151
 max_val = 1 / math.sqrt(2)
 
+save_enabled = False
+save_dir = None
+save_set_ts = ""
+current_exposure = 50000
+current_gain = 0
+
+gt_original = None
+gt_crop = None
+gt_source_name = ""
+snr_enabled = False
+snr_xpr_psnr = float('nan')
+snr_xpr_ssim = float('nan')
+snr_sub_psnr = [float('nan')] * 4   # PSNR for each of the 4 raw sub-images
+snr_sub_ssim = [float('nan')] * 4
+snr_avg_psnr = float('nan')          # PSNR of the pixel-averaged sub-image
+snr_avg_ssim = float('nan')
+snr_sub_ecc = [float('nan')] * 4    # ECC correlation per sub-image
+snr_avg_ecc = float('nan')
+snr_xpr_ecc = float('nan')
+
+_reg_data = None  # {"H_roi": 3×3 homography, "gt_rot": oriented GT, "ncc": float, "method": str, "src_h": int, "src_w": int}
+_reg_status = ""       # "SIFT (ncc=X.XXX, N inliers)" or "Fallback"
+_reg_debug = ""        # diagnostic text for GUI
+_reg_match_img = None  # float32 H×W [0,1] grayscale or uint8 H×W×3 RGB (SIFT matches)
+_sift_full_frame = None  # full-frame grayscale float32 [0,1], captured for SIFT registration
+
 # Camera detection
 try:
     # Try to detect BASLER camera
@@ -173,6 +201,9 @@ M2 = np.float32([[1, 0, -tilt], [0, 1, tilt]])
 M3 = np.float32([[1, 0, -tilt], [0, 1, 0]])
 M.extend((M0, M1, M2, M3))
 
+# Sub-pixel offsets per frame in native image pixels (from M matrices, ÷2)
+_SUB_OFFSETS = [(0.0, 0.0), (0.0, 0.5), (-0.5, 0.5), (-0.5, 0.0)]
+
 # Bayer channel masks — only needed for the colour Daheng path
 if cameraType == DAHENG:
     masktile_R = np.array([[True, False], [False, False]])
@@ -220,10 +251,16 @@ class Runnable_Full_Cam(QRunnable):
         global ROI_width, ROI_height, ROI_center_x, ROI_center_y
         global frame_CamImage, frame_CamZoom, frame_CamXPR, frame_CamXPR_numpy
         global channel, interpolation_mode, color_comparison
+        global save_enabled, save_dir, save_set_ts
+        global snr_enabled, gt_crop, snr_xpr_psnr, snr_xpr_ssim, snr_sub_psnr, snr_sub_ssim, snr_avg_psnr, snr_avg_ssim, _reg_match_img
+        global snr_sub_ecc, snr_avg_ecc, snr_xpr_ecc
+        global _sift_full_frame
 
         grab_mode = True
         if cameraType == BASLER:
             cam.StartGrabbing(1)
+
+        _snr_sub_gray: list = [None] * n_images  # grayscale float32 per sub-frame for SNR (DAHENG color)
 
         while grab_mode:
             time_start_FPS = time.time()
@@ -246,20 +283,35 @@ class Runnable_Full_Cam(QRunnable):
             elif cameraType == DAHENG:
                 cam.TriggerSoftware.send_command()
                 raw_image = cam.data_stream[0].get_image()
+                if raw_image is None:
+                    continue
                 rgb_image = raw_image.convert("RGB", convert_type=0)  # Bayer demosaic
                 frame = rgb_image.get_numpy_array()
             else:  # DAHENG_MONO
                 cam.TriggerSoftware.send_command()
                 raw_image = cam.data_stream[0].get_image()
+                if raw_image is None:
+                    continue
                 frame = cv2.cvtColor(raw_image.get_numpy_array(), cv2.COLOR_GRAY2RGB)
 
             bytesPerLine = 3 * w
+
+            # Capture full frame for SIFT registration (once, at frame 0, when needed)
+            if snr_enabled and gt_crop is not None and _reg_data is None and XPR_on and frame_number == 0:
+                _sift_full_frame = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY).astype(np.float32) / 255.0
 
             px1 = int(ROI_center_x - ROI_width // 2)
             px2 = int(ROI_center_x + ROI_width // 2)
             py1 = int(ROI_center_y - ROI_height // 2)
             py2 = int(ROI_center_y + ROI_height // 2)
             frameZoom = frame[py1:py2, px1:px2].copy()
+
+            if save_enabled and XPR_on:
+                if frame_number == 0:
+                    save_set_ts = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+                cv2.imwrite(str(_save_filename(f"raw{frame_number}")),
+                            cv2.cvtColor(frameZoom, cv2.COLOR_RGB2BGR))
+
             # add red frame around ROI
             frame[py1 - w_line:py1, px1 - w_line:px2 + w_line, :] = [255, 0, 0]
             frame[py2:py2 + w_line, px1 - w_line:px2 + w_line, :] = [255, 0, 0]
@@ -345,6 +397,11 @@ class Runnable_Full_Cam(QRunnable):
                         frame_CamXPR_numpy = np.zeros((2 * height, 2 * width, n_images), dtype=np.uint8)
                     mutex.unlock()
 
+                    # Store raw grayscale before warpAffine for SNR
+                    if snr_enabled and gt_crop is not None and XPR_on:
+                        _snr_sub_gray[frame_number] = cv2.cvtColor(
+                            frameZoom, cv2.COLOR_RGB2GRAY).astype(np.float32) / 255.0
+
                     frame_CamXPR_numpy[::2, ::2, frame_number] = frame_raw[py1: py2, px1: px2]
                     frame_CamXPR_numpy[:, :, frame_number] = cv2.warpAffine(
                         frame_CamXPR_numpy[:, :, frame_number], M[frame_number],
@@ -352,6 +409,25 @@ class Runnable_Full_Cam(QRunnable):
 
                     if frame_number == n_images - 1:
                         frame_CamXPR_numpy_HR = np.sum(frame_CamXPR_numpy, axis=2, dtype=np.uint8)
+                        if snr_enabled and gt_crop is not None:
+                            # Per-sub-image SNR from stored raw grayscale with beam-shift offsets
+                            for _i in range(n_images):
+                                if _snr_sub_gray[_i] is not None:
+                                    snr_sub_psnr[_i], snr_sub_ssim[_i], snr_sub_ecc[_i] = _compute_snr_pair(
+                                        gt_crop, _snr_sub_gray[_i], pixel_offset=_SUB_OFFSETS[_i])
+                            # Average of sub-images at native resolution
+                            if (all(f is not None for f in _snr_sub_gray) and
+                                    len(set(f.shape for f in _snr_sub_gray)) == 1):
+                                avg_raw = np.mean(np.stack(_snr_sub_gray, axis=2), axis=2)
+                            else:
+                                avg_raw = cv2.cvtColor(frameZoom, cv2.COLOR_RGB2GRAY).astype(np.float32) / 255.0
+                            snr_avg_psnr, snr_avg_ssim, snr_avg_ecc = _compute_snr_pair(gt_crop, avg_raw, store_match=True)
+                            # XPR result at 2× resolution
+                            xpr_gray = frame_CamXPR_numpy_HR.astype(np.float32) / 255.0
+                            snr_xpr_psnr, snr_xpr_ssim, snr_xpr_ecc = _compute_snr_pair(gt_crop, xpr_gray)
+                            win.updatedSNR.emit()
+                        if save_enabled:
+                            cv2.imwrite(str(_save_filename("xpr")), frame_CamXPR_numpy_HR)
                         frame_CamXPR = QImage.scaled(
                             QImage(frame_CamXPR_numpy_HR.data, frame_CamXPR_numpy_HR.shape[1],
                                    frame_CamXPR_numpy_HR.shape[0],
@@ -375,6 +451,11 @@ class Runnable_Full_Cam(QRunnable):
                         frame_CamXPR_numpy = np.zeros((frameZoom_resized.shape[0], frameZoom_resized.shape[1], 3),
                                                       dtype=np.uint8)
                     mutex.unlock()
+
+                    # Store this frame's grayscale for per-sub-image SNR
+                    if snr_enabled and gt_crop is not None and XPR_on:
+                        _snr_sub_gray[frame_number] = cv2.cvtColor(
+                            frameZoom, cv2.COLOR_RGB2GRAY).astype(np.float32) / 255.0
 
                     R_channel = np.where(mask_R, np.copy(frame_raw), 0)
                     G_channel = np.where(mask_G, np.copy(frame_raw), 0)
@@ -445,6 +526,26 @@ class Runnable_Full_Cam(QRunnable):
                             frame_tmp[frame_tmp >= min_color_similarity] = 1
                             frame_CamXPR_numpy_send = np.multiply(frameZoom_resized, frame_tmp[:, :, np.newaxis])
 
+                        if snr_enabled and gt_crop is not None:
+                            # Per-sub-image SNR from stored grayscale frames with beam-shift offsets
+                            for _i in range(n_images):
+                                if _snr_sub_gray[_i] is not None:
+                                    snr_sub_psnr[_i], snr_sub_ssim[_i], snr_sub_ecc[_i] = _compute_snr_pair(
+                                        gt_crop, _snr_sub_gray[_i], pixel_offset=_SUB_OFFSETS[_i])
+                            # Average of sub-images
+                            if (all(f is not None for f in _snr_sub_gray) and
+                                    len(set(f.shape for f in _snr_sub_gray)) == 1):
+                                avg_raw = np.mean(np.stack(_snr_sub_gray, axis=2), axis=2)
+                            else:
+                                avg_raw = cv2.cvtColor(frameZoom, cv2.COLOR_RGB2GRAY).astype(np.float32) / 255.0
+                            snr_avg_psnr, snr_avg_ssim, snr_avg_ecc = _compute_snr_pair(gt_crop, avg_raw, store_match=True)
+                            xpr_gray = cv2.cvtColor(frame_CamXPR_numpy, cv2.COLOR_RGB2GRAY).astype(np.float32) / 255.0
+                            snr_xpr_psnr, snr_xpr_ssim, snr_xpr_ecc = _compute_snr_pair(gt_crop, xpr_gray)
+                            win.updatedSNR.emit()
+                        if save_enabled:
+                            cv2.imwrite(str(_save_filename("xpr")),
+                                        cv2.cvtColor(frame_CamXPR_numpy_send, cv2.COLOR_RGB2BGR))
+
                         frame_CamXPR = QImage.scaled(
                             QImage(frame_CamXPR_numpy_send.data, frame_CamXPR_numpy.shape[1],
                                    frame_CamXPR_numpy.shape[0],
@@ -468,6 +569,11 @@ class Runnable_Full_Cam(QRunnable):
                         frame_CamXPR_numpy = np.zeros((2 * height, 2 * width, n_images), dtype=np.uint8)
                     mutex.unlock()
 
+                    # Store raw grayscale before warpAffine for SNR
+                    if snr_enabled and gt_crop is not None and XPR_on:
+                        _snr_sub_gray[frame_number] = cv2.cvtColor(
+                            frameZoom, cv2.COLOR_RGB2GRAY).astype(np.float32) / 255.0
+
                     frame_CamXPR_numpy[::2, ::2, frame_number] = frame_raw[py1: py2, px1: px2]
                     frame_CamXPR_numpy[:, :, frame_number] = cv2.warpAffine(frame_CamXPR_numpy[:, :, frame_number],
                                                                             M[frame_number], (2 * width, 2 * height),
@@ -475,6 +581,25 @@ class Runnable_Full_Cam(QRunnable):
 
                     if frame_number == n_images - 1:
                         frame_CamXPR_numpy_HR = np.sum(frame_CamXPR_numpy, axis=2, dtype=np.uint8)
+                        if snr_enabled and gt_crop is not None:
+                            # Per-sub-image SNR from stored raw grayscale with beam-shift offsets
+                            for _i in range(n_images):
+                                if _snr_sub_gray[_i] is not None:
+                                    snr_sub_psnr[_i], snr_sub_ssim[_i], snr_sub_ecc[_i] = _compute_snr_pair(
+                                        gt_crop, _snr_sub_gray[_i], pixel_offset=_SUB_OFFSETS[_i])
+                            # Average of sub-images at native resolution
+                            if (all(f is not None for f in _snr_sub_gray) and
+                                    len(set(f.shape for f in _snr_sub_gray)) == 1):
+                                avg_raw = np.mean(np.stack(_snr_sub_gray, axis=2), axis=2)
+                            else:
+                                avg_raw = cv2.cvtColor(frameZoom, cv2.COLOR_RGB2GRAY).astype(np.float32) / 255.0
+                            snr_avg_psnr, snr_avg_ssim, snr_avg_ecc = _compute_snr_pair(gt_crop, avg_raw, store_match=True)
+                            # XPR result at 2× resolution
+                            xpr_gray = frame_CamXPR_numpy_HR.astype(np.float32) / 255.0
+                            snr_xpr_psnr, snr_xpr_ssim, snr_xpr_ecc = _compute_snr_pair(gt_crop, xpr_gray)
+                            win.updatedSNR.emit()
+                        if save_enabled:
+                            cv2.imwrite(str(_save_filename("xpr")), frame_CamXPR_numpy_HR)
                         frame_CamXPR = QImage.scaled(
                             QImage(frame_CamXPR_numpy_HR.data, frame_CamXPR_numpy_HR.shape[1],
                                    frame_CamXPR_numpy_HR.shape[0],
@@ -512,6 +637,638 @@ class Runnable_Full_Cam(QRunnable):
             cam.StopGrabbing()
 
 
+class GTPickerDialog(QDialog):
+    """Modal dialog for selecting a rectangular region on a ground truth image."""
+
+    def __init__(self, gt_image: np.ndarray, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Select Ground Truth Region")
+        self._gt = gt_image          # original float32 [0,1] grayscale
+        self._crop = None            # will be set on confirm
+
+        orig_h, orig_w = gt_image.shape
+        max_display_h = 700
+        max_display_w = 900
+        self._scale = min(max_display_h / orig_h, max_display_w / orig_w, 1.0)
+        disp_h = int(orig_h * self._scale)
+        disp_w = int(orig_w * self._scale)
+
+        # Convert to displayable QPixmap (scale + convert to uint8 RGB)
+        disp = cv2.resize((gt_image * 255).astype(np.uint8), (disp_w, disp_h),
+                          interpolation=cv2.INTER_AREA)
+        disp_rgb = cv2.cvtColor(disp, cv2.COLOR_GRAY2RGB)
+        qimg = QImage(disp_rgb.data, disp_w, disp_h, 3 * disp_w, QImage.Format.Format_RGB888)
+        self._pixmap = QPixmap.fromImage(qimg)
+
+        self._label = QLabel()
+        self._label.setPixmap(self._pixmap)
+        self._label.setFixedSize(disp_w, disp_h)
+        self._label.setCursor(Qt.CrossCursor)
+        self._label.mousePressEvent = self._on_press
+        self._label.mouseMoveEvent = self._on_move
+        self._label.mouseReleaseEvent = self._on_release
+
+        self._rubber = QRubberBand(QRubberBand.Rectangle, self._label)
+        self._origin = None
+        self._sel = None   # (x1, y1, x2, y2) in original image coords
+
+        self._info = QLabel("Click and drag to select a region")
+        self._confirm = QPushButton("Confirm Selection")
+        self._confirm.setEnabled(False)
+        self._confirm.clicked.connect(self._on_confirm)
+        cancel = QPushButton("Cancel")
+        cancel.clicked.connect(self.reject)
+
+        btn_row = QHBoxLayout()
+        btn_row.addWidget(self._confirm)
+        btn_row.addWidget(cancel)
+
+        layout = QVBoxLayout()
+        layout.addWidget(self._label)
+        layout.addWidget(self._info)
+        layout.addLayout(btn_row)
+        self.setLayout(layout)
+
+    def _on_press(self, event):
+        self._origin = event.pos()
+        self._rubber.setGeometry(QRect(self._origin, QSize()))
+        self._rubber.show()
+
+    def _on_move(self, event):
+        if self._origin is not None:
+            self._rubber.setGeometry(QRect(self._origin, event.pos()).normalized())
+
+    def _on_release(self, event):
+        if self._origin is None:
+            return
+        rect = QRect(self._origin, event.pos()).normalized()
+        self._rubber.setGeometry(rect)
+
+        # Convert display coords to original image coords
+        s = self._scale
+        x1 = max(0, int(rect.x() / s))
+        y1 = max(0, int(rect.y() / s))
+        x2 = min(self._gt.shape[1], int((rect.x() + rect.width()) / s))
+        y2 = min(self._gt.shape[0], int((rect.y() + rect.height()) / s))
+
+        if (x2 - x1) > 2 and (y2 - y1) > 2:
+            self._sel = (x1, y1, x2, y2)
+            self._info.setText(f"Selection: x={x1} y={y1}  w={x2-x1} h={y2-y1} px")
+            self._confirm.setEnabled(True)
+        else:
+            self._sel = None
+            self._info.setText("Selection too small — drag a larger area")
+            self._confirm.setEnabled(False)
+
+        self._origin = None
+
+    def _on_confirm(self):
+        if self._sel is not None:
+            x1, y1, x2, y2 = self._sel
+            self._crop = self._gt[y1:y2, x1:x2].copy()
+            self.accept()
+
+    def get_crop(self) -> np.ndarray:
+        return self._crop
+
+
+def _lin_norm(ref: np.ndarray, img: np.ndarray) -> np.ndarray:
+    """Find a,b minimising ||ref - (a*img + b)||², apply to img, clip to [0,1]."""
+    img64 = img.ravel().astype(np.float64)
+    ref64 = ref.ravel().astype(np.float64)
+    var_img = float(np.var(img64))
+    if var_img < 1e-10:
+        return np.clip(np.full_like(img, float(ref64.mean())), 0, 1).astype(np.float32)
+    a = float(np.cov(img64, ref64)[0, 1] / var_img)
+    b = float(ref64.mean() - a * img64.mean())
+    return np.clip(a * img + b, 0, 1).astype(np.float32)
+
+
+def _best_orient(gt: np.ndarray, img: np.ndarray) -> np.ndarray:
+    """Try all 8 orientations (4 rotations × flip) of gt resized to img shape.
+    Returns the orientation that minimises MSE after linear normalisation.
+    Handles cameras/prints that are rotated or mirrored relative to the GT."""
+    best_mse = float('inf')
+    best_gt = None
+    h, w = img.shape
+    for k in range(4):
+        for flip in (False, True):
+            cand = np.rot90(gt, k)
+            if flip:
+                cand = np.fliplr(cand)
+            cand = cv2.resize(cand, (w, h), interpolation=cv2.INTER_AREA)
+            img_fit = _lin_norm(cand, img)
+            mse = float(np.mean((cand - img_fit) ** 2))
+            if mse < best_mse:
+                best_mse = mse
+                best_gt = cand
+    return best_gt
+
+
+def _psf_blur(tmpl: np.ndarray) -> np.ndarray:
+    """Apply small Gaussian blur to GT template to approximate camera PSF."""
+    k = max(3, int(min(tmpl.shape[1], tmpl.shape[0]) * 0.02) | 1)
+    return cv2.GaussianBlur(tmpl, (k, k), 0)
+
+
+def _multiscale_template_match(gt_crop: np.ndarray, full_frame: np.ndarray,
+                                roi_rect: tuple):
+    """Multi-scale template matching on the FULL camera frame.
+
+    The GT crop may be the entire printed chart (including the cross), not just
+    the barcode group visible in the ROI.  We therefore search over a wide
+    scale range and require the ROI center to fall INSIDE the matched region
+    (the chart must cover the ROI).
+
+    Phase 1:  Coarse multi-scale position search (2 aspect ratios × N scales).
+    Phase 1b: Orientation at the found position + scale (all 8, fair NCC).
+    Phase 2:  Fine scale + position refinement at full resolution.
+
+    Returns (gt_oriented, tx, ty, tw, th, ncc, label, debug_str) or None.
+    tx, ty = top-left of matched template in full-frame coordinates.
+    tw, th = template dimensions at the matched scale."""
+    px1, py1, px2, py2 = roi_rect
+    roi_w, roi_h = px2 - px1, py2 - py1
+    roi_cx, roi_cy = (px1 + px2) / 2.0, (py1 + py2) / 2.0
+    fh, fw = full_frame.shape[:2]
+    gt_h, gt_w = gt_crop.shape[:2]
+
+    # --- Phase 1: Coarse multi-scale position search on the full frame ---
+    CF = 4
+    frame_small = cv2.resize(full_frame, (fw // CF, fh // CF),
+                             interpolation=cv2.INTER_AREA)
+    fsh, fsw = frame_small.shape[:2]
+    roi_cx_c, roi_cy_c = roi_cx / CF, roi_cy / CF
+
+    # Scale range: from GT covering ~10% of the frame to ~90%
+    max_frame_scale = min(fw / gt_w, fh / gt_h)
+    scale_lo = 0.05 * max_frame_scale
+    scale_hi = 0.85 * max_frame_scale
+    N_SCALES = 25
+
+    best_p1_score = -1.0
+    best_p1 = None
+    p1_debug_lines = []
+
+    for k in (0, 1):  # two distinct aspect ratios
+        cand = np.rot90(gt_crop, k)
+        ch, cw = cand.shape[:2]
+
+        for scale in np.linspace(scale_lo, scale_hi, N_SCALES):
+            tw_c = max(1, int(cw * scale / CF))
+            th_c = max(1, int(ch * scale / CF))
+            if tw_c >= fsw - 2 or th_c >= fsh - 2 or tw_c < 16 or th_c < 16:
+                continue
+
+            tmpl = _psf_blur(
+                cv2.resize(cand, (tw_c, th_c),
+                           interpolation=cv2.INTER_AREA).astype(np.float32))
+            res = cv2.matchTemplate(frame_small, tmpl, cv2.TM_CCOEFF_NORMED)
+            _, mx_val, _, mx_loc = cv2.minMaxLoc(res)
+
+            # ROI containment: the ROI center must fall inside the matched region
+            tx_c, ty_c = mx_loc
+            if not (tx_c <= roi_cx_c <= tx_c + tw_c and
+                    ty_c <= roi_cy_c <= ty_c + th_c):
+                continue
+
+            if mx_val > best_p1_score:
+                best_p1_score = mx_val
+                best_p1 = (k, scale, mx_loc, tw_c, th_c, mx_val)
+
+    if best_p1 is None:
+        return None
+
+    p1_k, p1_scale, p1_loc, p1_tw, p1_th, p1_ncc = best_p1
+    # Full-frame coordinates of match center
+    cx_full = (p1_loc[0] + p1_tw / 2.0) * CF
+    cy_full = (p1_loc[1] + p1_th / 2.0) * CF
+
+    # --- Phase 1b: Orientation search at the found position + scale ---
+    orient_scores = []
+    best_orient_score = -1.0
+    best_orient = None
+    ORIENT_PRIOR_DECAY = 0.95  # 5% penalty per rotation step
+
+    for k in range(4):
+        for flip in (False, True):
+            cand = np.rot90(gt_crop, k)
+            if flip:
+                cand = np.fliplr(cand)
+            ch, cw = cand.shape[:2]
+            lbl = f"rot{k}" + ("/flip" if flip else "")
+
+            tw_f = max(1, int(cw * p1_scale))
+            th_f = max(1, int(ch * p1_scale))
+            if tw_f < 16 or th_f < 16:
+                orient_scores.append(f"{lbl}=skip")
+                continue
+
+            # Local search region around Phase 1 center (100% padding)
+            half_w, half_h = tw_f, th_f
+            lx1 = max(0, int(cx_full - half_w))
+            ly1 = max(0, int(cy_full - half_h))
+            lx2 = min(fw, int(cx_full + half_w))
+            ly2 = min(fh, int(cy_full + half_h))
+            if lx2 - lx1 < tw_f or ly2 - ly1 < th_f:
+                orient_scores.append(f"{lbl}=skip")
+                continue
+
+            local = full_frame[ly1:ly2, lx1:lx2]
+            tmpl = _psf_blur(
+                cv2.resize(cand, (tw_f, th_f),
+                           interpolation=cv2.INTER_AREA).astype(np.float32))
+            res = cv2.matchTemplate(local, tmpl, cv2.TM_CCOEFF_NORMED)
+            _, mx_val, _, _ = cv2.minMaxLoc(res)
+
+            steps = min(k, 4 - k)
+            if flip:
+                steps += 1
+            prior = ORIENT_PRIOR_DECAY ** steps
+            scored = mx_val * prior
+            orient_scores.append(f"{lbl}={mx_val:.4f}*{prior:.2f}={scored:.4f}")
+
+            if scored > best_orient_score:
+                best_orient_score = scored
+                best_orient = (cand, lbl, p1_scale, tw_f, th_f)
+
+    if best_orient is None:
+        debug = (f"TmplMatch: no orient match\n"
+                 f"  orient: {', '.join(orient_scores)}")
+        return None
+
+    cand, label, base_scale, tw_f, th_f = best_orient
+    ch, cw = cand.shape[:2]
+
+    # --- Phase 2: Fine scale + position refinement at full resolution ---
+    fine_pad = int(max(tw_f, th_f) * 0.3)
+    cx_tl = cx_full - tw_f / 2.0
+    cy_tl = cy_full - th_f / 2.0
+
+    best_fine_ncc = -1.0
+    best_fine = None
+
+    for scale in np.linspace(base_scale * 0.85, base_scale * 1.15, 15):
+        tw = max(1, int(cw * scale))
+        th = max(1, int(ch * scale))
+        if tw < 16 or th < 16:
+            continue
+        fx1 = max(0, int(cx_tl - fine_pad))
+        fy1 = max(0, int(cy_tl - fine_pad))
+        fx2 = min(fw, int(cx_tl + tw + fine_pad))
+        fy2 = min(fh, int(cy_tl + th + fine_pad))
+        if fx2 - fx1 < tw or fy2 - fy1 < th:
+            continue
+        region = full_frame[fy1:fy2, fx1:fx2]
+        tmpl = _psf_blur(
+            cv2.resize(cand, (tw, th),
+                       interpolation=cv2.INTER_AREA).astype(np.float32))
+        res = cv2.matchTemplate(region, tmpl, cv2.TM_CCOEFF_NORMED)
+        _, mx_val, _, mx_loc = cv2.minMaxLoc(res)
+        if mx_val > best_fine_ncc:
+            best_fine_ncc = mx_val
+            best_fine = (fx1 + mx_loc[0], fy1 + mx_loc[1],
+                         tw, th, mx_val, scale)
+
+    if best_fine is None:
+        tw = max(1, int(cw * base_scale))
+        th = max(1, int(ch * base_scale))
+        best_fine = (int(cx_tl), int(cy_tl), tw, th, 0.0, base_scale)
+
+    tx, ty, tw, th, fine_ncc, fine_scale = best_fine
+
+    debug = (f"TmplMatch: frame {fw}x{fh}, gt {gt_w}x{gt_h}\n"
+             f"  scale range [{scale_lo:.4f}, {scale_hi:.4f}], "
+             f"N={N_SCALES}, CF={CF}\n"
+             f"  Phase 1: k={p1_k}, scale={p1_scale:.4f}, "
+             f"NCC={p1_ncc:.4f}, pos=({cx_full:.0f},{cy_full:.0f})\n"
+             f"  Phase 1b orient: {', '.join(orient_scores)}\n"
+             f"  best orient: {label}\n"
+             f"  Phase 2: scale={fine_scale:.4f}, tmpl {tw}x{th}, "
+             f"pos ({tx},{ty}), NCC={fine_ncc:.4f}")
+    return cand, tx, ty, tw, th, fine_ncc, label, debug
+
+
+def _build_match_visualization(full_frame: np.ndarray, tx: int, ty: int,
+                                tw: int, th: int, roi_rect: tuple,
+                                label: str, ncc: float) -> np.ndarray:
+    """Draw match rectangle (green) and ROI (red) on the full frame. Returns uint8 RGB."""
+    fh, fw = full_frame.shape[:2]
+    max_dim = 800
+    s = min(max_dim / fw, max_dim / fh, 1.0)
+    if s < 1.0:
+        vis = cv2.resize((full_frame * 255).astype(np.uint8),
+                         (int(fw * s), int(fh * s)), interpolation=cv2.INTER_AREA)
+    else:
+        vis = (full_frame * 255).astype(np.uint8)
+    vis = cv2.cvtColor(vis, cv2.COLOR_GRAY2RGB)
+    # Match rectangle (green)
+    cv2.rectangle(vis, (int(tx * s), int(ty * s)),
+                  (int((tx + tw) * s), int((ty + th) * s)), (0, 255, 0), 2)
+    # ROI rectangle (red)
+    px1, py1, px2, py2 = roi_rect
+    cv2.rectangle(vis, (int(px1 * s), int(py1 * s)),
+                  (int(px2 * s), int(py2 * s)), (255, 0, 0), 2)
+    cv2.putText(vis, f"{label} NCC={ncc:.3f}",
+                (int(tx * s), max(int(ty * s) - 8, 15)),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+    return vis
+
+
+def _register_gt(gt_crop: np.ndarray, img: np.ndarray,
+                 pixel_offset=(0.0, 0.0), store_match=False):
+    """Register gt_crop onto img via multi-scale template matching (full frame) + ECC (ROI).
+    Initial call: template match on full frame, ECC MOTION_TRANSLATION refinement.
+    Subsequent calls: apply cached homography + beam offset.
+    pixel_offset: sub-pixel (dx, dy) for beam-shifted sub-images.
+    store_match: if True, re-run ECC refinement and update cache; save aligned GT.
+    Returns (gt_warped, (y1,y2,x1,x2), ncc_score) on success, or None."""
+    global _reg_data, _reg_status, _reg_debug, _sift_full_frame, _reg_match_img
+
+    h, w = img.shape[:2]
+    img_f32 = img.astype(np.float32) if img.dtype != np.float32 else img
+
+    # Snapshot to avoid race with invalidate_registration() on GUI thread
+    cached = _reg_data
+
+    # --- Per-frame: apply cached homography + beam offset ---
+    if cached is not None:
+        gt_rot = cached["gt_rot"]
+        src_h, src_w = cached["src_h"], cached["src_w"]
+        H = cached["H_roi"].copy()
+        ncc_score = cached["ncc"]
+        # Scale homography for current resolution (handles XPR 2× case)
+        if w != src_w or h != src_h:
+            sx, sy = w / src_w, h / src_h
+            S_out = np.diag([sx, sy, 1.0])
+            S_in = np.diag([1.0 / sx, 1.0 / sy, 1.0])
+            H = S_out @ H @ S_in
+        # Apply beam offset
+        T_offset = np.eye(3, dtype=np.float64)
+        T_offset[0, 2] = pixel_offset[0]
+        T_offset[1, 2] = pixel_offset[1]
+        H = T_offset @ H
+        # Resize GT to current img dims and warp
+        gt_resized = cv2.resize(gt_rot, (w, h),
+                                interpolation=cv2.INTER_AREA).astype(np.float32)
+        # If store_match (average image), try ECC refinement
+        if store_match:
+            gt_warped_pre = cv2.warpPerspective(
+                gt_resized, H, (w, h), flags=cv2.INTER_LINEAR).astype(np.float32)
+            # Compute valid region for NCC/ECC (GT may not fill entire ROI)
+            mask_pre = cv2.warpPerspective(
+                np.ones((h, w), dtype=np.float32), H, (w, h)) > 0.5
+            rows_vp = np.any(mask_pre, axis=1)
+            cols_vp = np.any(mask_pre, axis=0)
+            if rows_vp.any() and cols_vp.any():
+                vy1p = int(np.where(rows_vp)[0][0]);  vy2p = int(np.where(rows_vp)[0][-1]) + 1
+                vx1p = int(np.where(cols_vp)[0][0]);  vx2p = int(np.where(cols_vp)[0][-1]) + 1
+            else:
+                vy1p, vy2p, vx1p, vx2p = 0, h, 0, w
+            vhp, vwp = vy2p - vy1p, vx2p - vx1p
+            if min(vhp, vwp) >= 8:
+                ncc_before = float(cv2.matchTemplate(
+                    img_f32[vy1p:vy2p, vx1p:vx2p],
+                    gt_warped_pre[vy1p:vy2p, vx1p:vx2p],
+                    cv2.TM_CCOEFF_NORMED)[0, 0])
+            else:
+                ncc_before = 0.0
+            try:
+                blur_k = max(3, int(min(vhp, vwp) * 0.02) | 1)
+                img_blur = cv2.GaussianBlur(
+                    img_f32[vy1p:vy2p, vx1p:vx2p], (blur_k, blur_k), 0)
+                gt_blur = cv2.GaussianBlur(
+                    gt_warped_pre[vy1p:vy2p, vx1p:vx2p], (blur_k, blur_k), 0)
+                warp_ecc = np.eye(2, 3, dtype=np.float32)
+                criteria = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 200, 1e-6)
+                _, warp_ecc = cv2.findTransformECC(
+                    img_blur, gt_blur, warp_ecc, cv2.MOTION_TRANSLATION, criteria)
+                gt_warped_ecc = cv2.warpAffine(
+                    gt_warped_pre, warp_ecc, (w, h), flags=cv2.INTER_LINEAR).astype(np.float32)
+                dtx_e, dty_e = float(warp_ecc[0, 2]), float(warp_ecc[1, 2])
+                evy1 = max(0, int(round(vy1p + dty_e)));  evy2 = min(h, int(round(vy2p + dty_e)))
+                evx1 = max(0, int(round(vx1p + dtx_e)));  evx2 = min(w, int(round(vx2p + dtx_e)))
+                if min(evy2 - evy1, evx2 - evx1) >= 8:
+                    ncc_after = float(cv2.matchTemplate(
+                        img_f32[evy1:evy2, evx1:evx2],
+                        gt_warped_ecc[evy1:evy2, evx1:evx2],
+                        cv2.TM_CCOEFF_NORMED)[0, 0])
+                else:
+                    ncc_after = 0.0
+                if ncc_after > ncc_before:
+                    # ECC improved — compose refinement into cached H
+                    T_refine = np.eye(3, dtype=np.float64)
+                    T_refine[0, 2] = float(warp_ecc[0, 2])
+                    T_refine[1, 2] = float(warp_ecc[1, 2])
+                    # Update cache (at source resolution)
+                    H_base = cached["H_roi"].copy()
+                    if w != src_w or h != src_h:
+                        sx, sy = w / src_w, h / src_h
+                        T_refine_src = np.eye(3, dtype=np.float64)
+                        T_refine_src[0, 2] = T_refine[0, 2] / sx
+                        T_refine_src[1, 2] = T_refine[1, 2] / sy
+                        cached["H_roi"] = T_refine_src @ H_base
+                    else:
+                        cached["H_roi"] = T_refine @ H_base
+                    cached["ncc"] = ncc_after
+                    ncc_score = ncc_after
+                    H = T_refine @ H  # update current H too
+            except cv2.error:
+                pass
+        gt_warped = cv2.warpPerspective(
+            gt_resized, H, (w, h), flags=cv2.INTER_LINEAR).astype(np.float32)
+        # Compute bbox from warp mask
+        mask_warp = cv2.warpPerspective(
+            np.ones((h, w), dtype=np.float32), H, (w, h)) > 0.5
+        rows = np.any(mask_warp, axis=1)
+        cols = np.any(mask_warp, axis=0)
+        if not rows.any() or not cols.any():
+            _reg_status = "Fallback"
+            return None
+        y1 = int(np.where(rows)[0][0]);  y2 = int(np.where(rows)[0][-1]) + 1
+        x1 = int(np.where(cols)[0][0]);  x2 = int(np.where(cols)[0][-1]) + 1
+        _reg_status = f"{cached['method']} (ncc={ncc_score:.3f})"
+        if store_match:
+            _reg_match_img = gt_warped[y1:y2, x1:x2]
+        return gt_warped, (y1, y2, x1, x2), float(ncc_score)
+
+    # --- Initial registration: multi-scale template matching on full frame ---
+    if _sift_full_frame is None:
+        _reg_status = "Fallback"
+        _reg_debug = "No full frame available (waiting for frame 0)"
+        return None
+
+    full_frame = _sift_full_frame
+    _sift_full_frame = None  # free memory
+
+    px1 = int(ROI_center_x - ROI_width // 2)
+    py1 = int(ROI_center_y - ROI_height // 2)
+    px2 = px1 + int(ROI_width)
+    py2 = py1 + int(ROI_height)
+
+    result = _multiscale_template_match(gt_crop, full_frame, (px1, py1, px2, py2))
+    if result is None:
+        _reg_status = "Fallback"
+        _reg_debug += "\nTmplMatch: no valid match across all orientations"
+        return None
+
+    gt_oriented, tx, ty, tw, th, ncc_match, label, tm_debug = result
+    _reg_debug = tm_debug
+
+    # Build H_roi: simple scale + translate (GT-resized → ROI coords)
+    H_roi = np.array([
+        [tw / w,  0.0,    tx - px1],
+        [0.0,     th / h, ty - py1],
+        [0.0,     0.0,    1.0     ]
+    ], dtype=np.float64)
+
+    # Warp GT and compute valid region (GT may not fill the entire ROI)
+    gt_resized = cv2.resize(gt_oriented, (w, h),
+                            interpolation=cv2.INTER_AREA).astype(np.float32)
+    gt_warped = cv2.warpPerspective(
+        gt_resized, H_roi, (w, h), flags=cv2.INTER_LINEAR).astype(np.float32)
+    mask_warp = cv2.warpPerspective(
+        np.ones((h, w), dtype=np.float32), H_roi, (w, h)) > 0.5
+    rows_v = np.any(mask_warp, axis=1)
+    cols_v = np.any(mask_warp, axis=0)
+    if not rows_v.any() or not cols_v.any():
+        _reg_status = "Fallback"
+        _reg_debug += "\n>> Warp produced empty region"
+        return None
+    vy1 = int(np.where(rows_v)[0][0]);  vy2 = int(np.where(rows_v)[0][-1]) + 1
+    vx1 = int(np.where(cols_v)[0][0]);  vx2 = int(np.where(cols_v)[0][-1]) + 1
+    vh, vw = vy2 - vy1, vx2 - vx1
+
+    # NCC on valid region only (avoid degenerate result from zero-padded areas)
+    if min(vh, vw) >= 8:
+        ncc_score = float(cv2.matchTemplate(
+            img_f32[vy1:vy2, vx1:vx2], gt_warped[vy1:vy2, vx1:vx2],
+            cv2.TM_CCOEFF_NORMED)[0, 0])
+    else:
+        ncc_score = 0.0
+    _reg_debug += (f"\n>> H_roi NCC (pre-ECC, valid {vw}x{vh} of {w}x{h}): "
+                   f"{ncc_score:.4f}")
+
+    # ECC MOTION_TRANSLATION refinement on valid region only
+    try:
+        blur_k = max(3, int(min(vh, vw) * 0.02) | 1)
+        img_blur = cv2.GaussianBlur(img_f32[vy1:vy2, vx1:vx2], (blur_k, blur_k), 0)
+        gt_blur = cv2.GaussianBlur(gt_warped[vy1:vy2, vx1:vx2], (blur_k, blur_k), 0)
+        warp_ecc = np.eye(2, 3, dtype=np.float32)
+        criteria = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 200, 1e-6)
+        _, warp_ecc = cv2.findTransformECC(
+            img_blur, gt_blur, warp_ecc, cv2.MOTION_TRANSLATION, criteria)
+        dtx, dty = float(warp_ecc[0, 2]), float(warp_ecc[1, 2])
+        # Apply refinement to full-image warp
+        gt_warped_ecc = cv2.warpAffine(
+            gt_warped, warp_ecc, (w, h), flags=cv2.INTER_LINEAR).astype(np.float32)
+        # NCC on shifted valid region
+        evy1 = max(0, int(round(vy1 + dty)));  evy2 = min(h, int(round(vy2 + dty)))
+        evx1 = max(0, int(round(vx1 + dtx)));  evx2 = min(w, int(round(vx2 + dtx)))
+        if min(evy2 - evy1, evx2 - evx1) >= 8:
+            ncc_after = float(cv2.matchTemplate(
+                img_f32[evy1:evy2, evx1:evx2],
+                gt_warped_ecc[evy1:evy2, evx1:evx2],
+                cv2.TM_CCOEFF_NORMED)[0, 0])
+        else:
+            ncc_after = 0.0
+        if ncc_after > ncc_score:
+            T_refine = np.eye(3, dtype=np.float64)
+            T_refine[0, 2] = dtx
+            T_refine[1, 2] = dty
+            H_roi = T_refine @ H_roi
+            gt_warped = gt_warped_ecc
+            _reg_debug += f"\n>> ECC refine: dtx={dtx:.2f} dty={dty:.2f} NCC {ncc_score:.4f}→{ncc_after:.4f}"
+            ncc_score = ncc_after
+        else:
+            _reg_debug += f"\n>> ECC refine rejected: NCC {ncc_score:.4f}→{ncc_after:.4f} (worse)"
+    except cv2.error as e:
+        _reg_debug += f"\n>> ECC refine FAILED: {e} (using template-match only)"
+
+    # Store match visualization for GUI
+    _reg_match_img = _build_match_visualization(
+        full_frame, tx, ty, tw, th, (px1, py1, px2, py2), label, ncc_match)
+
+    # Cache registration
+    _reg_data = {"H_roi": H_roi, "gt_rot": gt_oriented,
+                 "ncc": ncc_score, "method": "TmplMatch",
+                 "src_h": h, "src_w": w}
+
+    # Apply beam offset and warp for this frame
+    T_offset = np.eye(3, dtype=np.float64)
+    T_offset[0, 2] = pixel_offset[0]
+    T_offset[1, 2] = pixel_offset[1]
+    H_final = T_offset @ H_roi
+    gt_warped = cv2.warpPerspective(
+        gt_resized, H_final, (w, h), flags=cv2.INTER_LINEAR).astype(np.float32)
+    mask_warp = cv2.warpPerspective(
+        np.ones((h, w), dtype=np.float32), H_final, (w, h)) > 0.5
+    rows = np.any(mask_warp, axis=1)
+    cols = np.any(mask_warp, axis=0)
+    if not rows.any() or not cols.any():
+        _reg_status = "Fallback"
+        return None
+    y1 = int(np.where(rows)[0][0]);  y2 = int(np.where(rows)[0][-1]) + 1
+    x1 = int(np.where(cols)[0][0]);  x2 = int(np.where(cols)[0][-1]) + 1
+    _reg_status = f"TmplMatch (ncc={ncc_score:.3f})"
+    return gt_warped, (y1, y2, x1, x2), float(ncc_score)
+
+
+_SNR_BORDER = 10  # pixels to exclude at each edge (SR algorithm produces a thin bezel)
+
+
+def _compute_snr_pair(gt_crop: np.ndarray, img: np.ndarray, store_match: bool = False,
+                      pixel_offset=(0.0, 0.0)):
+    """Return (psnr, ssim, ncc_score) by registering gt_crop onto img.
+    Uses template matching (full frame) + ECC MOTION_TRANSLATION (cached); falls back to discrete orientation.
+    pixel_offset: sub-pixel (dx, dy) in native image pixels for beam-shifted sub-images.
+    Applies a _SNR_BORDER-pixel inset to exclude the SR bezel before scoring.
+    If store_match=True, saves the aligned GT crop to _reg_match_img for GUI display."""
+    global _reg_match_img
+    from skimage.metrics import peak_signal_noise_ratio as _psnr, structural_similarity as _ssim
+    result = _register_gt(gt_crop, img, pixel_offset=pixel_offset,
+                          store_match=store_match)
+    ecc_score = float('nan')
+    if result is not None:
+        gt_warped, (y1, y2, x1, x2), ecc_score = result
+        gt_aligned = gt_warped[y1:y2, x1:x2]
+        img_eval = img[y1:y2, x1:x2]
+    else:
+        # Fallback: resize to img dims, then pick best discrete orientation
+        gt_resized = cv2.resize(gt_crop, (img.shape[1], img.shape[0]),
+                                interpolation=cv2.INTER_AREA)
+        gt_aligned = _best_orient(gt_resized, img)
+        img_eval = img
+    if store_match and result is None:
+        _reg_match_img = gt_aligned  # fallback only; normal path handled by _register_gt
+    # Exclude border pixels (SR bezel)
+    b = _SNR_BORDER
+    if gt_aligned.shape[0] > 2 * b and gt_aligned.shape[1] > 2 * b:
+        gt_aligned = gt_aligned[b:-b, b:-b]
+        img_eval = img_eval[b:-b, b:-b]
+    min_dim = min(gt_aligned.shape[0], gt_aligned.shape[1])
+    if min_dim < 7:
+        return float('nan'), float('nan'), float(ecc_score)
+    img_fit = _lin_norm(gt_aligned, img_eval)
+    psnr_val = _psnr(gt_aligned, img_fit, data_range=1.0)
+    win_size = min(7, min_dim if min_dim % 2 == 1 else min_dim - 1)
+    ssim_val = _ssim(gt_aligned, img_fit, data_range=1.0, win_size=win_size)
+    return float(psnr_val), float(ssim_val), float(ecc_score)
+
+
+def _save_filename(frame_type: str) -> Path:
+    cam_str = {BASLER: "BASLER", DAHENG: "DAHENG_COLOR", DAHENG_MONO: "DAHENG_MONO"}[cameraType]
+    roi = f"roi{ROI_width}x{ROI_height}"
+    tilt = f"tilt{tilt_angle:.5f}"
+    snr_tag = ""
+    if snr_enabled and "xpr" in frame_type and not math.isnan(snr_xpr_psnr):
+        snr_tag = f"_psnr{snr_xpr_psnr:.1f}dB_ssim{snr_xpr_ssim:.3f}"
+    elif snr_enabled and "raw" in frame_type and not math.isnan(snr_avg_psnr):
+        snr_tag = f"_psnravg{snr_avg_psnr:.1f}dB_ssim{snr_avg_ssim:.3f}"
+    fname = f"{save_set_ts}_{cam_str}_exp{current_exposure}us_gain{current_gain}dB_{roi}_{tilt}{snr_tag}_{frame_type}.png"
+    return save_dir / fname
+
+
 class Window(QMainWindow, Ui_MainWindow):
     # signals corresponding to processes that happen in separate thread
     updatedCamImage = pyqtSignal()
@@ -519,6 +1276,7 @@ class Window(QMainWindow, Ui_MainWindow):
     updatedCamXPR = pyqtSignal()
     updatedFPS = pyqtSignal()
     updatedFPS2 = pyqtSignal()
+    updatedSNR = pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -581,6 +1339,101 @@ class Window(QMainWindow, Ui_MainWindow):
             self.radioButtonRed.hide()
             self.radioButtonBlue.hide()
             self.radioButtonRedBlue.hide()
+
+        # ---- Tilt Angle controls (added to right XPR column) ----
+        self.TitleTiltAngle = QLabel("Tilt Angle (rad)")
+        self.TiltAngleSlider = QSlider(Qt.Horizontal)
+        self.TiltAngleSlider.setRange(0, 5000)
+        self.TiltAngleSlider.setValue(round(tilt_angle * 10000))
+        self.TiltAngleSlider.setTickInterval(100)
+        self.TiltAngleSlider.setMaximumWidth(200)
+        self.TiltAngleValue = QLabel(f"{tilt_angle:.5f}")
+
+        tilt_preset_row = QHBoxLayout()
+        self.ButtonTiltDahengColor = QPushButton("Daheng\nColor")
+        self.ButtonTiltDahengMono = QPushButton("Daheng\nMono")
+        self.ButtonTiltBasler = QPushButton("Basler")
+        tilt_preset_row.addWidget(self.ButtonTiltDahengColor)
+        tilt_preset_row.addWidget(self.ButtonTiltDahengMono)
+        tilt_preset_row.addWidget(self.ButtonTiltBasler)
+
+        self.XPRLayout.addWidget(self.TitleTiltAngle)
+        self.XPRLayout.addWidget(self.TiltAngleSlider)
+        self.XPRLayout.addWidget(self.TiltAngleValue)
+        self.XPRLayout.addLayout(tilt_preset_row)
+
+        self.TiltAngleSlider.valueChanged.connect(self.set_tilt_angle_from_slider)
+        self.ButtonTiltDahengColor.clicked.connect(lambda: self.set_tilt_preset(0.14391 * 2))
+        self.ButtonTiltDahengMono.clicked.connect(lambda: self.set_tilt_preset(0.14391))
+        self.ButtonTiltBasler.clicked.connect(lambda: self.set_tilt_preset(0.05005))
+
+        # ---- Save controls (added to middle Start/Stop column) ----
+        self.ButtonSave = QPushButton("Start Saving")
+        self.ButtonSave.setFixedSize(200, 40)
+        self.SaveDirLabel = QLabel("(not saving)")
+        self.SaveDirLabel.setWordWrap(True)
+        self.SaveDirLabel.setMaximumWidth(200)
+
+        self.StartStopLayout.addWidget(self.ButtonSave)
+        self.StartStopLayout.addWidget(self.SaveDirLabel)
+
+        self.ButtonSave.clicked.connect(self.toggle_save)
+
+        # ---- Ground Truth controls (mini-box stays in right XPR column) ----
+        snr_ctrl = QGroupBox("Ground Truth")
+        snr_ctrl_inner = QVBoxLayout()
+
+        self.ButtonLoadGT = QPushButton("Load GT Image\u2026")
+        self.GTStatusLabel = QLabel("No GT loaded")
+        self.GTStatusLabel.setWordWrap(True)
+        self.ButtonEnableSNR = QCheckBox("Enable SNR")
+        self.ButtonEnableSNR.setEnabled(False)
+        self.ButtonReRegister = QPushButton("Re-register")
+        self.ButtonReRegister.setEnabled(False)
+
+        for _w in [self.ButtonLoadGT, self.GTStatusLabel,
+                   self.ButtonEnableSNR, self.ButtonReRegister]:
+            snr_ctrl_inner.addWidget(_w)
+        snr_ctrl.setLayout(snr_ctrl_inner)
+        self.XPRLayout.addWidget(snr_ctrl)
+
+        # ---- Large GT Match & SNR display panel (inserted beside CamXPR in LowerLayout) ----
+        snr_panel = QGroupBox("GT Match & SNR")
+        snr_panel_inner = QVBoxLayout()
+
+        self.GTMatchLabel = QLabel("GT match will appear here")
+        self.GTMatchLabel.setMinimumSize(300, 225)
+        self.GTMatchLabel.setAlignment(Qt.AlignCenter)
+        self.GTMatchLabel.setStyleSheet("border: 1px solid gray; background: #111; color: gray;")
+
+        self.SNRRegLabel = QLabel("Registration: \u2014")
+        self.SNRSubLabels = [QLabel(f"Sub {_i}:  PSNR \u2014 dB  SSIM \u2014") for _i in range(4)]
+        self.SNRAvgLabel  = QLabel("Avg:  PSNR \u2014 dB  SSIM \u2014")
+        self.SNRXprLabel  = QLabel("XPR:  PSNR \u2014 dB  SSIM \u2014")
+        self.SNRDeltaLabel = QLabel("\u0394 PSNR (XPR vs Avg)  \u2014")
+        self.SNRInfoGainLabel = QLabel("\u0394 Info (XPR vs Avg)  \u2014")
+        self.SNRDebugLabel = QLabel("")
+        self.SNRDebugLabel.setWordWrap(True)
+        self.SNRDebugLabel.setStyleSheet("color: #888; font-size: 10px; font-family: monospace;")
+
+        snr_panel_inner.addWidget(self.GTMatchLabel)
+        snr_panel_inner.addWidget(self.SNRRegLabel)
+        for _lbl in self.SNRSubLabels:
+            snr_panel_inner.addWidget(_lbl)
+        snr_panel_inner.addWidget(self.SNRAvgLabel)
+        snr_panel_inner.addWidget(self.SNRXprLabel)
+        snr_panel_inner.addWidget(self.SNRDeltaLabel)
+        snr_panel_inner.addWidget(self.SNRInfoGainLabel)
+        snr_panel_inner.addWidget(self.SNRDebugLabel)
+        snr_panel.setLayout(snr_panel_inner)
+
+        # Place in top row alongside camera controls (avoids competing with image display columns)
+        self.UpperLayout.addWidget(snr_panel)
+
+        self.ButtonLoadGT.clicked.connect(self.load_gt_image)
+        self.ButtonEnableSNR.toggled.connect(self.toggle_snr)
+        self.ButtonReRegister.clicked.connect(self.invalidate_registration)
+        self.updatedSNR.connect(self.updateSNR)
 
         self.CamImage.mousePressEvent = self.getPos
 
@@ -703,12 +1556,16 @@ class Window(QMainWindow, Ui_MainWindow):
         mutex.unlock()
 
     def setExposure(self, value):
+        global current_exposure
+        current_exposure = value
         if cameraType == BASLER:
             cam.ExposureTime.SetValue(value)
         else:
             cam.ExposureTime.set(value)
 
     def setGain(self, value):
+        global current_gain
+        current_gain = value
         if cameraType == BASLER:
             cam.Gain.SetValue(value)
         else:
@@ -719,6 +1576,7 @@ class Window(QMainWindow, Ui_MainWindow):
             cam.BalanceWhiteAuto.set(2)
 
     def setAutoExposure(self):
+        global current_exposure
         if cameraType in (DAHENG, DAHENG_MONO):
             cam.ExposureAuto.set(2)
             time.sleep(1)
@@ -730,6 +1588,7 @@ class Window(QMainWindow, Ui_MainWindow):
             cam.ExposureAuto.SetValue("Off")
             value = int(cam.ExposureTime.GetValue())
 
+        current_exposure = value
         self.SliderExposure.sliderPosition = value
         self.SliderExposure.setValue(value)
         self.ExposureValue.setNum(value)
@@ -781,6 +1640,141 @@ class Window(QMainWindow, Ui_MainWindow):
         elif self.radioButtonRedBlue.isChecked():
             color_comparison = REDBLUE
         mutex.unlock()
+
+    def toggle_save(self):
+        global save_enabled, save_dir
+        save_enabled = not save_enabled
+        if save_enabled:
+            ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+            save_dir = Path.home() / "xpr_saves" / ts
+            save_dir.mkdir(parents=True, exist_ok=True)
+            self.ButtonSave.setText("Stop Saving")
+            self.SaveDirLabel.setText(f"~/xpr_saves/{ts}")
+        else:
+            self.ButtonSave.setText("Start Saving")
+            self.SaveDirLabel.setText("(not saving)")
+
+    def set_tilt_angle_from_slider(self, value):
+        global tilt_angle, angles
+        tilt_angle = value / 10000.0
+        mutex.lock()
+        angles[:] = tilt_angle * px_shifts
+        mutex.unlock()
+        self.TiltAngleValue.setText(f"{tilt_angle:.5f}")
+
+    def set_tilt_preset(self, preset_val):
+        global tilt_angle, angles
+        tilt_angle = preset_val
+        mutex.lock()
+        angles[:] = tilt_angle * px_shifts
+        mutex.unlock()
+        self.TiltAngleSlider.setValue(round(tilt_angle * 10000))
+        self.TiltAngleValue.setText(f"{tilt_angle:.5f}")
+
+    def load_gt_image(self):
+        global gt_original, gt_crop, gt_source_name
+        path, _ = QFileDialog.getOpenFileName(
+            self, "Load Ground Truth Image", "",
+            "Images & PDFs (*.png *.jpg *.jpeg *.tiff *.tif *.bmp *.pdf)")
+        if not path:
+            return
+        path = Path(path)
+
+        if path.suffix.lower() == '.pdf':
+            import fitz
+            doc = fitz.open(str(path))
+            page_num = 0
+            if doc.page_count > 1:
+                page_num, ok = QInputDialog.getInt(
+                    self, "PDF Page",
+                    f"Page number (0\u2013{doc.page_count - 1}):",
+                    0, 0, doc.page_count - 1)
+                if not ok:
+                    return
+            page = doc[page_num]
+            mat = fitz.Matrix(600 / 72, 600 / 72)  # 600 DPI — 4× more pixels for better SIFT
+            pix = page.get_pixmap(matrix=mat, colorspace=fitz.csGRAY)
+            arr = np.frombuffer(pix.samples, dtype=np.uint8).reshape(pix.height, pix.width)
+            gt_img = arr.astype(np.float32) / 255.0
+        else:
+            img = cv2.imread(str(path))
+            if img is None:
+                QMessageBox.warning(self, "Load Error", f"Cannot load: {path.name}")
+                return
+            gt_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY).astype(np.float32) / 255.0
+            # 4× nearest-neighbour upsample: barcodes are discrete, so NN preserves edges
+            gt_img = cv2.resize(gt_img, None, fx=4, fy=4, interpolation=cv2.INTER_NEAREST)
+
+        dialog = GTPickerDialog(gt_img, parent=self)
+        if dialog.exec_() == QDialog.Accepted:
+            gt_crop = dialog.get_crop()
+            gt_original = gt_img
+            gt_source_name = path.name
+            self.GTStatusLabel.setText(
+                f"GT: {path.name}\nCrop: {gt_crop.shape[1]}\u00d7{gt_crop.shape[0]} px")
+            self.ButtonEnableSNR.setEnabled(True)
+            self.invalidate_registration()
+            self.ButtonReRegister.setEnabled(True)
+
+    def toggle_snr(self, checked: bool):
+        global snr_enabled
+        snr_enabled = checked
+        if not checked:
+            for _i, _lbl in enumerate(self.SNRSubLabels):
+                _lbl.setText(f"Sub {_i}:  PSNR \u2014 dB  SSIM \u2014")
+            self.SNRAvgLabel.setText("Avg:  PSNR \u2014 dB  SSIM \u2014")
+            self.SNRXprLabel.setText("XPR:  PSNR \u2014 dB  SSIM \u2014")
+            self.SNRDeltaLabel.setText("\u0394 PSNR  \u2014")
+            self.SNRInfoGainLabel.setText("\u0394 Info  \u2014")
+
+    def invalidate_registration(self):
+        global _reg_data, _sift_full_frame
+        _reg_data = None
+        _sift_full_frame = None
+        self.SNRRegLabel.setText("Registration: (pending re-register)")
+        self.SNRRegLabel.setStyleSheet("")
+
+    def updateSNR(self):
+        if math.isnan(snr_avg_psnr):
+            return
+        reg_color = "green" if "Fallback" not in _reg_status else "orange"
+        self.SNRRegLabel.setText(f"Registration: {_reg_status}")
+        self.SNRRegLabel.setStyleSheet(f"color: {reg_color};")
+        for _i, _lbl in enumerate(self.SNRSubLabels):
+            if not math.isnan(snr_sub_psnr[_i]):
+                ncc_str = f"  NCC {snr_sub_ecc[_i]:.3f}" if not math.isnan(snr_sub_ecc[_i]) else ""
+                _lbl.setText(f"Sub {_i}:  {snr_sub_psnr[_i]:.1f} dB  SSIM {snr_sub_ssim[_i]:.3f}{ncc_str}")
+        avg_ncc_str = f"  NCC {snr_avg_ecc:.3f}" if not math.isnan(snr_avg_ecc) else ""
+        self.SNRAvgLabel.setText(f"Avg:  {snr_avg_psnr:.1f} dB  SSIM {snr_avg_ssim:.3f}{avg_ncc_str}")
+        xpr_ncc_str = f"  NCC {snr_xpr_ecc:.3f}" if not math.isnan(snr_xpr_ecc) else ""
+        self.SNRXprLabel.setText(f"XPR:  {snr_xpr_psnr:.1f} dB  SSIM {snr_xpr_ssim:.3f}{xpr_ncc_str}")
+        delta = snr_xpr_psnr - snr_avg_psnr
+        sign = "+" if delta >= 0 else ""
+        color = "green" if delta > 0 else "red"
+        self.SNRDeltaLabel.setText(f"\u0394 PSNR (XPR vs Avg)  {sign}{delta:.1f} dB")
+        self.SNRDeltaLabel.setStyleSheet(f"color: {color}; font-weight: bold;")
+        # Information gain: same PSNR at higher resolution = more information
+        info_gain = delta + 10 * math.log10(4)  # 2× resolution = 4× pixels → +6.02 dB
+        ig_sign = "+" if info_gain >= 0 else ""
+        ig_color = "green" if info_gain > 0 else "red"
+        self.SNRInfoGainLabel.setText(f"\u0394 Info (XPR vs Avg)  {ig_sign}{info_gain:.1f} dB")
+        self.SNRInfoGainLabel.setStyleSheet(f"color: {ig_color}; font-weight: bold;")
+        if _reg_debug:
+            self.SNRDebugLabel.setText(_reg_debug)
+        if _reg_match_img is not None:
+            m = _reg_match_img
+            if m.ndim == 3:  # RGB — SIFT match visualization
+                m_u8 = m if m.dtype == np.uint8 else (m * 255).astype(np.uint8)
+                qimg = QImage(m_u8.data, m_u8.shape[1], m_u8.shape[0],
+                              3 * m_u8.shape[1], QImage.Format_RGB888)
+            else:  # Grayscale — aligned GT
+                m_u8 = (m * 255).astype(np.uint8)
+                qimg = QImage(m_u8.data, m_u8.shape[1], m_u8.shape[0],
+                              m_u8.shape[1], QImage.Format_Grayscale8)
+            pix = QPixmap.fromImage(qimg).scaled(
+                self.GTMatchLabel.width(), self.GTMatchLabel.height(),
+                Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            self.GTMatchLabel.setPixmap(pix)
 
 
 app = QApplication(sys.argv)
