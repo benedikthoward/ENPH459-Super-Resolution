@@ -6,13 +6,13 @@ import gxipy as gx
 
 class DahengCamera:
     def __init__(self, device_index: int = 0):
-        dm = gx.DeviceManager()
-        dev_num, dev_info_list = dm.update_device_list()
+        self._dm = gx.DeviceManager()
+        dev_num, dev_info_list = self._dm.update_device_list()
         if dev_num == 0:
             raise RuntimeError("No Daheng camera detected")
 
         sn = dev_info_list[device_index].get("sn")
-        self._cam = dm.open_device_by_sn(sn)
+        self._cam = self._dm.open_device_by_sn(sn)
         self._cam.data_stream[0].StreamBufferHandlingMode.set(3)
         self._cam.TriggerMode.set(1)
         self._cam.Gain.set(0)
