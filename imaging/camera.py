@@ -36,16 +36,20 @@ class DahengCamera:
         self._cam.stream_off()
         self._cam.close_device()
 
+    def _get_timeout_ms(self) -> int:
+        """Timeout for get_image: exposure time + 2s margin."""
+        return int(self._cam.ExposureTime.get() / 1000) + 2000
+
     def capture_raw(self) -> np.ndarray:
         self._cam.TriggerSoftware.send_command()
-        raw = self._cam.data_stream[0].get_image()
+        raw = self._cam.data_stream[0].get_image(timeout=self._get_timeout_ms())
         if raw is None:
             raise RuntimeError("Failed to capture image")
         return raw.get_numpy_array()
 
     def capture_rgb(self) -> np.ndarray:
         self._cam.TriggerSoftware.send_command()
-        raw = self._cam.data_stream[0].get_image()
+        raw = self._cam.data_stream[0].get_image(timeout=self._get_timeout_ms())
         if raw is None:
             raise RuntimeError("Failed to capture image")
         if self._is_color:
