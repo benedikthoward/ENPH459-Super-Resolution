@@ -34,8 +34,8 @@ from imaging import XPRController, DahengCamera
 
 # ── Parameters ──────────────────────────────────────────────────────────────
 TILT_ANGLE_CENTER = 0.14391    # radians — Daheng Mono nominal 1px shift
-TILT_ANGLE_SPREAD = 0.03      # radians — sweep ± this amount around center
-TILT_ANGLE_STEPS = 5           # number of tilt angles to try
+TILT_ANGLE_SPREAD = 0.05      # radians — sweep ± this amount around center
+TILT_ANGLE_STEPS = 20          # number of tilt angles to try
 
 SETTLE_TIMES_MS = [2, 10, 50, 200, 1000]  # ms — biased toward low values
 

@@ -34,6 +34,58 @@ def laplacian_variance(gray: np.ndarray, roi=None) -> float:
     return cv2.Laplacian(gray, cv2.CV_64F).var()
 
 
+def peak_intensity(gray: np.ndarray, roi=None) -> float:
+    if roi is not None:
+        x, y, w, h = roi
+        gray = gray[y:y+h, x:x+w]
+    if gray.size == 0:
+        return 0.0
+    return float(np.max(gray))
+
+
+def encircled_energy_ratio(gray: np.ndarray, roi=None) -> float:
+    """Fraction of total energy within 5px of the centroid — higher = tighter spot."""
+    if roi is not None:
+        x, y, w, h = roi
+        gray = gray[y:y+h, x:x+w]
+    if gray.size == 0:
+        return 0.0
+    img = gray.astype(np.float64)
+    total = img.sum()
+    if total == 0:
+        return 0.0
+    ys, xs = np.mgrid[:img.shape[0], :img.shape[1]]
+    cx = (xs * img).sum() / total
+    cy = (ys * img).sum() / total
+    radius = 5
+    dist_sq = (xs - cx) ** 2 + (ys - cy) ** 2
+    core_energy = img[dist_sq <= radius ** 2].sum()
+    return core_energy / total
+
+
+def normalized_variance(gray: np.ndarray, roi=None) -> float:
+    if roi is not None:
+        x, y, w, h = roi
+        gray = gray[y:y+h, x:x+w]
+    if gray.size == 0:
+        return 0.0
+    img = gray.astype(np.float64)
+    mean = img.mean()
+    if mean == 0:
+        return 0.0
+    return img.var() / mean
+
+
+FOCUS_METRICS = {
+    "Laplacian Variance": laplacian_variance,
+    "Peak Intensity": peak_intensity,
+    "Encircled Energy": encircled_energy_ratio,
+    "Normalized Variance": normalized_variance,
+}
+
+DEFAULT_METRIC = "Laplacian Variance"
+
+
 def _get_limit(axis, setting: str, fallback: float) -> float:
     try:
         return axis.settings.get(setting, Units.LENGTH_MILLIMETRES)
@@ -111,7 +163,7 @@ class ViewfinderLabel(QLabel):
         # draw focus metric
         p.setPen(QPen(QColor(0, 255, 0)))
         p.setFont(QFont("Monospace", 14, QFont.Bold))
-        p.drawText(self._offset + QPoint(10, 25), f"Focus: {self._focus_metric:.1f}")
+        p.drawText(self._offset + QPoint(10, 25), f"Focus: {self._focus_metric:.4g}")
         p.end()
 
     def _widget_to_img(self, pos: QPoint):
@@ -160,6 +212,7 @@ class CameraThread(QThread):
         self.cam = cam
         self.running = True
         self.roi = None
+        self.metric_fn = laplacian_variance
 
     def run(self):
         while self.running:
@@ -168,7 +221,7 @@ class CameraThread(QThread):
             except Exception:
                 self.msleep(100)
                 continue
-            metric = laplacian_variance(frame, self.roi)
+            metric = self.metric_fn(frame, self.roi)
             self.frame_ready.emit(frame)
             self.focus_metric_ready.emit(metric)
 
@@ -179,7 +232,7 @@ class AutofocusWorker(QThread):
     progress = pyqtSignal(str)
     finished = pyqtSignal(list, list, float)  # positions, metrics, best_pos
 
-    def __init__(self, cam, axis, af_min, af_max, coarse_steps, fine_steps, roi):
+    def __init__(self, cam, axis, af_min, af_max, coarse_steps, fine_steps, roi, metric_fn):
         super().__init__()
         self.cam = cam
         self.axis = axis
@@ -188,6 +241,7 @@ class AutofocusWorker(QThread):
         self.coarse_steps = coarse_steps
         self.fine_steps = fine_steps
         self.roi = roi
+        self.metric_fn = metric_fn
 
     def run(self):
         positions = []
@@ -200,7 +254,7 @@ class AutofocusWorker(QThread):
             self.axis.move_absolute(pos, Units.LENGTH_MILLIMETRES, wait_until_idle=True)
             time.sleep(0.05)
             frame = self.cam.capture_raw()
-            m = laplacian_variance(frame, self.roi)
+            m = self.metric_fn(frame, self.roi)
             positions.append(pos)
             metrics.append(m)
 
@@ -217,7 +271,7 @@ class AutofocusWorker(QThread):
             self.axis.move_absolute(pos, Units.LENGTH_MILLIMETRES, wait_until_idle=True)
             time.sleep(0.05)
             frame = self.cam.capture_raw()
-            m = laplacian_variance(frame, self.roi)
+            m = self.metric_fn(frame, self.roi)
             positions.append(pos)
             metrics.append(m)
 
@@ -337,6 +391,13 @@ class AutofocusGUI(QMainWindow):
         self._axis_combo.currentTextChanged.connect(self._on_focus_axis_changed)
         af_lay.addWidget(self._axis_combo)
 
+        af_lay.addWidget(QLabel("Focus Metric:"))
+        self._metric_combo = QComboBox()
+        self._metric_combo.addItems(list(FOCUS_METRICS.keys()))
+        self._metric_combo.setCurrentText(DEFAULT_METRIC)
+        self._metric_combo.currentTextChanged.connect(self._on_metric_changed)
+        af_lay.addWidget(self._metric_combo)
+
         self._af_range_label = QLabel("Search range (mm):")
         af_lay.addWidget(self._af_range_label)
 
@@ -436,6 +497,7 @@ class AutofocusGUI(QMainWindow):
         if self._cam is None:
             return
         self._cam_thread = CameraThread(self._cam)
+        self._cam_thread.metric_fn = FOCUS_METRICS[self._metric_combo.currentText()]
         self._cam_thread.frame_ready.connect(self._on_frame)
         self._cam_thread.focus_metric_ready.connect(self._viewfinder.set_focus_metric)
         self._cam_thread.start()
@@ -448,6 +510,10 @@ class AutofocusGUI(QMainWindow):
 
     def _on_frame(self, frame: np.ndarray):
         self._viewfinder.set_frame(frame)
+
+    def _on_metric_changed(self, name: str):
+        if self._cam_thread:
+            self._cam_thread.metric_fn = FOCUS_METRICS[name]
 
     def _on_roi_changed(self, roi):
         self._roi = roi
@@ -525,6 +591,7 @@ class AutofocusGUI(QMainWindow):
             return
 
         self._af_btn.setEnabled(False)
+        self._metric_combo.setEnabled(False)
         self._stop_live()
 
         self._af_worker = AutofocusWorker(
@@ -535,6 +602,7 @@ class AutofocusGUI(QMainWindow):
             coarse_steps=self._coarse_spin.value(),
             fine_steps=self._fine_spin.value(),
             roi=self._roi,
+            metric_fn=FOCUS_METRICS[self._metric_combo.currentText()],
         )
         self._af_worker.progress.connect(self._af_status.setText)
         self._af_worker.finished.connect(self._on_autofocus_done)
@@ -542,17 +610,19 @@ class AutofocusGUI(QMainWindow):
 
     def _on_autofocus_done(self, positions, metrics, best_pos):
         self._af_btn.setEnabled(True)
+        self._metric_combo.setEnabled(True)
         self._af_status.setText(f"Best focus: {best_pos:.3f} mm")
         self._start_live()
         self._show_focus_curve(positions, metrics, best_pos)
 
     def _show_focus_curve(self, positions, metrics, best_pos):
+        metric_name = self._metric_combo.currentText()
         fig, ax = plt.subplots(figsize=(8, 5))
         ax.plot(positions, metrics, "o-", markersize=4)
         ax.axvline(best_pos, color="r", linestyle="--", label=f"Best: {best_pos:.3f} mm")
         ax.set_xlabel("Position (mm)")
-        ax.set_ylabel("Laplacian Variance")
-        ax.set_title("Autofocus Curve")
+        ax.set_ylabel(metric_name)
+        ax.set_title(f"Autofocus Curve ({metric_name})")
         ax.legend()
         ax.grid(True, alpha=0.3)
         plt.tight_layout()
