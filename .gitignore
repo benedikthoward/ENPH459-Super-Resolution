@@ -1,3 +1,8 @@
+# Local data & backups
+raw_capture_data/
+stability_data/
+imaging_backup/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

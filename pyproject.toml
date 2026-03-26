@@ -16,6 +16,7 @@ dependencies = [
     "iai-gxipy",
     "scikit-image",
     "pymupdf",
+    "matplotlib",
 ]
 
 [tool.uv]
