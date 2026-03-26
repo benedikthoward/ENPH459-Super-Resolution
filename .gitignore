@@ -229,3 +229,5 @@ target/
 # Rust coverage tools
 *.profraw
 *.profdata
+
+stability_data/

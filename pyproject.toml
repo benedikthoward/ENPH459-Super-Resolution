@@ -33,6 +33,7 @@ override-dependencies = [
 members = [
     "SR_prototyping",
     "SR_core/shifting_driver",
+    "imaging",
 ]
 
 [tool.uv.sources]
