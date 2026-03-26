@@ -4,7 +4,7 @@ track knife-edge position jitter over time.
 
 Uses short exposure for max FPS. Captures first, then processes.
 
-    uv run python -m imaging.calibration.position_stability
+    uv run python -m optics_experiments.position_stability
 """
 
 import csv

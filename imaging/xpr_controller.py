@@ -1,11 +1,13 @@
+import time
+
 import numpy as np
 import optoICC
 from optoControllerToolbox.SmartFilter import SmartFilters
 
 
 class XPRController:
-    def __init__(self):
-        self._icc = optoICC.connect()
+    def __init__(self, port: str | None = None):
+        self._icc = optoICC.connect(port=port)
         self._icc.reset(force=True)
         self._icc.go_pro()
 
@@ -66,6 +68,16 @@ class XPRController:
             optoICC.DeviceModel(self._icc.MiscFeatures.GetDeviceType(i))
             for i in range(4)
         ]
+
+    def setup_trigger_output(self):
+        """Configure GPIO0 as an output for hardware triggering."""
+        self._icc.MiscFeatures.SetGPIOdirection(0x01)
+
+    def send_trigger_pulse(self, pulse_us: int = 100):
+        """Send a rising-edge pulse on GPIO0 to trigger the camera."""
+        self._icc.MiscFeatures.SetGPIOstate(0x01)
+        time.sleep(pulse_us / 1_000_000)
+        self._icc.MiscFeatures.SetGPIOstate(0x00)
 
     @staticmethod
     def get_xpr_angles(tilt_angle: float) -> np.ndarray:

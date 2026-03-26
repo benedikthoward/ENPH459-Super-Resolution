@@ -3,9 +3,16 @@ import time
 import numpy as np
 import gxipy as gx
 
+# gxipy trigger source values (from gxidef.py)
+TRIGGER_SOFTWARE = 0
+TRIGGER_LINE0 = 1   # opto-isolated input
+TRIGGER_LINE2 = 3   # GPIO (3.3V logic)
+TRIGGER_LINE3 = 4   # GPIO (3.3V logic)
+
 
 class DahengCamera:
-    def __init__(self, device_index: int = 0):
+    def __init__(self, device_index: int = 0, hardware_trigger: bool = False,
+                 trigger_line: int = TRIGGER_LINE3):
         self._dm = gx.DeviceManager()
         dev_num, dev_info_list = self._dm.update_device_list()
         if dev_num == 0:
@@ -16,6 +23,14 @@ class DahengCamera:
         self._cam.data_stream[0].StreamBufferHandlingMode.set(3)
         self._cam.TriggerMode.set(1)
         self._cam.Gain.set(0)
+
+        self._hardware_trigger = hardware_trigger
+        if hardware_trigger:
+            self._cam.TriggerSource.set(trigger_line)
+            self._cam.TriggerActivation.set(1)  # rising edge
+        else:
+            self._cam.TriggerSource.set(TRIGGER_SOFTWARE)
+
         self._cam.stream_on()
 
         try:
@@ -41,14 +56,16 @@ class DahengCamera:
         return int(self._cam.ExposureTime.get() / 1000) + 2000
 
     def capture_raw(self) -> np.ndarray:
-        self._cam.TriggerSoftware.send_command()
+        if not self._hardware_trigger:
+            self._cam.TriggerSoftware.send_command()
         raw = self._cam.data_stream[0].get_image(timeout=self._get_timeout_ms())
         if raw is None:
             raise RuntimeError("Failed to capture image")
         return raw.get_numpy_array()
 
     def capture_rgb(self) -> np.ndarray:
-        self._cam.TriggerSoftware.send_command()
+        if not self._hardware_trigger:
+            self._cam.TriggerSoftware.send_command()
         raw = self._cam.data_stream[0].get_image(timeout=self._get_timeout_ms())
         if raw is None:
             raise RuntimeError("Failed to capture image")

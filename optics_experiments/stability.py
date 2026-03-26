@@ -7,7 +7,7 @@ The script averages rows to get a 1D profile, finds the 50% crossing point
 with linear interpolation for sub-pixel edge position, then compares
 positions between XPR frames to get the shift.
 
-Edit the parameters below, then run: python -m imaging.calibration.stability
+Edit the parameters below, then run: uv run python -m optics_experiments.stability
 """
 
 import json

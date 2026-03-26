@@ -1,7 +1,7 @@
 """
 Autofocus GUI: live camera viewfinder + Zaber stage jog + autofocus.
 
-    uv run python -m imaging.autofocus --port /dev/ttyUSB0
+    uv run python -m optics_experiments.autofocus --port /dev/ttyUSB0
 """
 
 import sys

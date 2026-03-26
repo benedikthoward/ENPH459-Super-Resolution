@@ -20,7 +20,7 @@ for all captures — auto_exposure() does NOT re-run per image.
 All images and a metadata JSON are saved to a timestamped subdirectory.
 
 Edit the parameters below, then run:
-    python -m imaging.calibration.collect_raw_images
+    uv run python -m optics_experiments.collect_raw_images
 """
 
 import json
