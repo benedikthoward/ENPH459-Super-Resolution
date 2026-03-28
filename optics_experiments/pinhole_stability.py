@@ -39,7 +39,7 @@ TILT_Y_MAX = 0.30
 TILT_Y_STEPS = 15
 
 SETTLING_TIME_MS = 10          # ms, delay after each shift
-NUM_REPEATS = 5                # repeats per tilt angle for statistics
+NUM_REPEATS = 5                # repeats per tilt angle
 GAIN = 0                       # dB
 EXPOSURE = None                # µs, or None for auto
 PSF_CROP_RADIUS = 50           # px, crop window around pinhole for PSF fit
@@ -107,6 +107,7 @@ def run_sweep(xpr, cam, tilt_angles, sweep_axis: str, out: Path):
     """
     results = {}
     csv_rows = []
+    saved_images = []
     total_angles = len(tilt_angles)
     total_captures = total_angles * NUM_REPEATS * 9
     capture_count = 0
@@ -119,6 +120,9 @@ def run_sweep(xpr, cam, tilt_angles, sweep_axis: str, out: Path):
 
         positions = _get_grid_positions(dx, dy)
         shifts_all_repeats = []
+        combo_label = f"sweep{sweep_axis}_tilt{tilt:.5f}deg"
+        combo_dir = out / combo_label
+        combo_dir.mkdir(exist_ok=True)
         print(f"\n  [{ti + 1}/{total_angles}] {sweep_axis}-sweep tilt = {tilt:.5f} deg")
 
         for r in range(NUM_REPEATS):
@@ -129,8 +133,11 @@ def run_sweep(xpr, cam, tilt_angles, sweep_axis: str, out: Path):
                 img = cam.capture_raw()
                 capture_count += 1
 
-                fname = f"sweep{sweep_axis}_tilt{tilt:.5f}_rep{r:02d}_pos{p}.png"
-                cv2.imwrite(str(out / fname), img)
+                # save image on first repeat only
+                if r == 0:
+                    fname = f"{combo_label}/pos{p}_{GRID_LABELS[p].replace(' ','')}.png"
+                    cv2.imwrite(str(out / fname), img)
+                    saved_images.append(fname)
 
                 cx, cy = find_pinhole_center(img)
                 centers[p] = (cx, cy)
@@ -183,7 +190,7 @@ def run_sweep(xpr, cam, tilt_angles, sweep_axis: str, out: Path):
 
         xpr.set_home()
 
-    return results, csv_rows
+    return results, csv_rows, saved_images
 
 
 def plot_results(x_results: dict, y_results: dict, out: Path):
@@ -283,30 +290,41 @@ def save_shifts_csv(x_results: dict, y_results: dict, out: Path):
     print(f"Shifts CSV saved to {csv_path}")
 
 
-def run(xpr_port: str | None = None):
+def run(xpr_port: str | None = None, exposure: float | None = None, gain: float | None = None):
     run_ts = datetime.now().strftime("%Y%m%d_%H%M%S")
     out = OUTPUT_DIR / run_ts
     out.mkdir(parents=True, exist_ok=True)
 
-    with XPRController(port=xpr_port) as xpr, DahengCamera() as cam:
-        cam.gain = GAIN
-        if EXPOSURE is not None:
-            cam.exposure = EXPOSURE
-        else:
-            cam.auto_exposure()
+    use_exposure = exposure if exposure is not None else EXPOSURE
+    use_gain = gain if gain is not None else GAIN
 
-        params = {
-            "tilt_x_angles": TILT_X_ANGLES.tolist(),
-            "tilt_y_angles": TILT_Y_ANGLES.tolist(),
-            "settling_time_ms": SETTLING_TIME_MS,
-            "num_repeats": NUM_REPEATS,
-            "psf_crop_radius": PSF_CROP_RADIUS,
-            "exposure_us": cam.exposure,
-            "gain_db": cam.gain,
-            "camera": {"width": cam.width, "height": cam.height, "is_color": cam.is_color},
-            "timestamp": run_ts,
-        }
-        (out / "params.json").write_text(json.dumps(params, indent=2))
+    with XPRController(port=xpr_port) as xpr, DahengCamera() as cam:
+        cam.gain = use_gain
+        if use_exposure is not None:
+            cam.exposure = use_exposure
+        else:
+            # auto-expose targeting peak intensity ~230/255
+            TARGET_PEAK = 220
+            cam.exposure = 10000  # start at 10ms
+            print("Auto-exposing for peak intensity target...")
+            for iteration in range(15):
+                frame = cam.capture_raw()
+                peak = int(frame.max())
+                current_exp = cam.exposure
+                if peak == 0:
+                    cam.exposure = current_exp * 4
+                    print(f"  iter {iteration}: peak={peak}, exp={current_exp:.0f} -> {cam.exposure:.0f} µs")
+                    continue
+                ratio = TARGET_PEAK / peak
+                new_exp = current_exp * ratio
+                new_exp = max(100, min(500000, new_exp))  # clamp to valid range
+                cam.exposure = new_exp
+                print(f"  iter {iteration}: peak={peak}/255, exp={current_exp:.0f} -> {new_exp:.0f} µs")
+                if abs(peak - TARGET_PEAK) <= 10:
+                    break
+            # verify final
+            frame = cam.capture_raw()
+            print(f"  Final: peak={int(frame.max())}/255, exposure={cam.exposure:.0f} µs")
 
         print(f"Saving to {out}")
         print(f"Exposure: {cam.exposure} µs, Gain: {cam.gain} dB")
@@ -321,11 +339,11 @@ def run(xpr_port: str | None = None):
 
         # X-axis sweep (dy=0)
         print("=== X-axis sweep ===")
-        x_results, x_csv = run_sweep(xpr, cam, TILT_X_ANGLES, "x", out)
+        x_results, x_csv, x_images = run_sweep(xpr, cam, TILT_X_ANGLES, "x", out)
 
         # Y-axis sweep (dx=0)
         print("\n=== Y-axis sweep ===")
-        y_results, y_csv = run_sweep(xpr, cam, TILT_Y_ANGLES, "y", out)
+        y_results, y_csv, y_images = run_sweep(xpr, cam, TILT_Y_ANGLES, "y", out)
 
         # save raw centers CSV
         csv_path = out / "centers.csv"
@@ -339,13 +357,34 @@ def run(xpr_port: str | None = None):
         # save shifts CSV
         save_shifts_csv(x_results, y_results, out)
 
-        # save JSON
+        # save JSON with results, params, description, and image list
         all_results = {
+            "description": (
+                "Pinhole shift experiment: measures pixel shift of a pinhole image "
+                "as a function of XPR tilt angle. A 3x3 grid of positions is visited "
+                "at each tilt value: (-dx,+dy), (0,+dy), (+dx,+dy), (-dx,0), (0,0), "
+                "(+dx,0), (-dx,-dy), (0,-dy), (+dx,-dy). Position (0,0) is the "
+                "reference. X and Y axes are swept independently. Sub-pixel center "
+                "is found via 2D Gaussian PSF fit."
+            ),
+            "params": {
+                "tilt_x_angles_deg": TILT_X_ANGLES.tolist(),
+                "tilt_y_angles_deg": TILT_Y_ANGLES.tolist(),
+                "settling_time_ms": SETTLING_TIME_MS,
+                "num_repeats": NUM_REPEATS,
+                "psf_crop_radius": PSF_CROP_RADIUS,
+                "exposure_us": cam.exposure,
+                "gain_db": cam.gain,
+                "camera": {"width": cam.width, "height": cam.height, "is_color": cam.is_color},
+            },
+            "grid_labels": GRID_LABELS,
+            "timestamp": run_ts,
+            "images": x_images + y_images,
             "x_sweep": {f"{k:.5f}": v for k, v in x_results.items()},
             "y_sweep": {f"{k:.5f}": v for k, v in y_results.items()},
         }
-        (out / "shifts.json").write_text(json.dumps(all_results, indent=2))
-        print(f"Shifts JSON saved to {out / 'shifts.json'}")
+        (out / "results.json").write_text(json.dumps(all_results, indent=2))
+        print(f"Results JSON saved to {out / 'results.json'}")
 
     plot_results(x_results, y_results, out)
     print("Done.")
@@ -355,5 +394,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Pinhole shift stability experiment")
     parser.add_argument("--xpr-port", default=None,
                         help="Serial port for XPR controller (e.g. /dev/ttyACM1)")
+    parser.add_argument("--exposure", type=float, default=None,
+                        help="Exposure time in µs (default: auto)")
+    parser.add_argument("--gain", type=float, default=None,
+                        help="Gain in dB (default: 0)")
     args = parser.parse_args()
-    run(xpr_port=args.xpr_port)
+    run(xpr_port=args.xpr_port, exposure=args.exposure, gain=args.gain)

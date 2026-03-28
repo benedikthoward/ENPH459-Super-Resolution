@@ -4,11 +4,15 @@ Autofocus GUI: live camera viewfinder + Zaber stage jog + autofocus.
     uv run python -m optics_experiments.autofocus --port /dev/ttyUSB0
 """
 
+import csv
+import json
 import sys
 import argparse
 import time
 import cv2
 import numpy as np
+from datetime import datetime
+from pathlib import Path
 import matplotlib.pyplot as plt
 
 from PyQt5.QtCore import Qt, QThread, QRect, QPoint, pyqtSignal
@@ -16,13 +20,16 @@ from PyQt5.QtGui import QImage, QPixmap, QPainter, QPen, QColor, QFont
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QLabel, QWidget, QHBoxLayout, QVBoxLayout,
     QPushButton, QSlider, QDoubleSpinBox, QSpinBox, QComboBox, QGroupBox,
-    QMessageBox, QRubberBand,
+    QCheckBox, QMessageBox, QRubberBand,
 )
 
 from zaber_motion import Units
 from zaber_motion.ascii import Connection
 
 from imaging.camera import DahengCamera
+from optics_experiments.psf_mtf import (
+    find_peak, extract_psf, fit_gaussian_psf, compute_mtf, mtf_at_fraction,
+)
 
 
 def laplacian_variance(gray: np.ndarray, roi=None) -> float:
@@ -76,11 +83,35 @@ def normalized_variance(gray: np.ndarray, roi=None) -> float:
     return img.var() / mean
 
 
+def fwhm_metric(gray: np.ndarray, roi=None) -> float:
+    """Inverse FWHM from 2D Gaussian PSF fit — higher = tighter spot = better focus."""
+    if roi is not None:
+        x, y, w, h = roi
+        gray = gray[y:y+h, x:x+w]
+    if gray.size == 0:
+        return 0.0
+    img = gray.astype(np.float64)
+    peak = find_peak(img)
+    radius = min(50, min(img.shape) // 2 - 1)
+    if radius < 5:
+        return 0.0
+    psf = extract_psf(img, peak, radius)
+    popt, _ = fit_gaussian_psf(psf)
+    if popt is None:
+        return 0.0
+    sigma_x, sigma_y = popt[3], popt[4]
+    fwhm = 2.3548 * (sigma_x + sigma_y) / 2.0  # average FWHM
+    if fwhm < 0.1:
+        return 0.0
+    return 1.0 / fwhm  # invert so higher = better focus
+
+
 FOCUS_METRICS = {
     "Laplacian Variance": laplacian_variance,
     "Peak Intensity": peak_intensity,
     "Encircled Energy": encircled_energy_ratio,
     "Normalized Variance": normalized_variance,
+    "FWHM (point source)": fwhm_metric,
 }
 
 DEFAULT_METRIC = "Laplacian Variance"
@@ -217,22 +248,58 @@ class CameraThread(QThread):
     def run(self):
         while self.running:
             try:
-                frame = self.cam.capture_raw()
+                if self.cam.is_color:
+                    frame = self.cam.capture_rgb()
+                else:
+                    frame = self.cam.capture_raw()
             except Exception:
                 self.msleep(100)
                 continue
-            metric = self.metric_fn(frame, self.roi)
+            gray = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY) if frame.ndim == 3 else frame
+            metric = self.metric_fn(gray, self.roi)
             self.frame_ready.emit(frame)
             self.focus_metric_ready.emit(metric)
 
 
 # ── Autofocus worker ────────────────────────────────────────────────────────
 
+def _compute_mtf50(frame: np.ndarray, roi=None, psf_mode: bool = False) -> float:
+    """Compute MTF50 (cycles/pixel) from a frame.
+
+    If psf_mode is True, treats the (ROI of the) image as a direct PSF
+    and computes the MTF from it via FFT. Otherwise, extracts the PSF
+    from the brightest spot first.
+    """
+    if roi is not None:
+        x, y, w, h = roi
+        frame = frame[y:y+h, x:x+w]
+    if frame.size == 0:
+        return 0.0
+    img = frame.astype(np.float64)
+
+    if psf_mode:
+        # image IS the PSF — subtract background and compute MTF directly
+        bg = np.median(img)
+        psf = np.clip(img - bg, 0, None)
+    else:
+        peak = find_peak(img)
+        radius = min(50, min(img.shape) // 2 - 1)
+        if radius < 5:
+            return 0.0
+        psf = extract_psf(img, peak, radius)
+
+    freq, mtf_profile, _, _, _ = compute_mtf(psf)
+    mtf50 = mtf_at_fraction(freq, mtf_profile, 0.5)
+    return float(mtf50) if not np.isnan(mtf50) else 0.0
+
+
 class AutofocusWorker(QThread):
     progress = pyqtSignal(str)
-    finished = pyqtSignal(list, list, float)  # positions, metrics, best_pos
+    # positions, metrics, mtf50s, best_pos
+    finished = pyqtSignal(list, list, list, float)
 
-    def __init__(self, cam, axis, af_min, af_max, coarse_steps, fine_steps, roi, metric_fn):
+    def __init__(self, cam, axis, af_min, af_max, coarse_steps, fine_steps, roi, metric_fn,
+                 save_images_dir=None, psf_mode=False):
         super().__init__()
         self.cam = cam
         self.axis = axis
@@ -242,21 +309,33 @@ class AutofocusWorker(QThread):
         self.fine_steps = fine_steps
         self.roi = roi
         self.metric_fn = metric_fn
+        self.save_images_dir = save_images_dir
+        self.psf_mode = psf_mode
 
     def run(self):
         positions = []
         metrics = []
+        mtf50s = []
 
         # coarse sweep
         coarse_pos = np.linspace(self.af_min, self.af_max, self.coarse_steps)
         for i, pos in enumerate(coarse_pos):
             self.progress.emit(f"Coarse {i+1}/{self.coarse_steps}: {pos:.3f} mm")
             self.axis.move_absolute(pos, Units.LENGTH_MILLIMETRES, wait_until_idle=True)
-            time.sleep(0.05)
-            frame = self.cam.capture_raw()
-            m = self.metric_fn(frame, self.roi)
+            time.sleep(1.0)  # 1s mechanical settle
+            if self.cam.is_color:
+                frame = self.cam.capture_rgb()
+            else:
+                frame = self.cam.capture_raw()
+            if self.save_images_dir:
+                save_frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR) if frame.ndim == 3 else frame
+                cv2.imwrite(str(self.save_images_dir / f"coarse_{i:03d}_{pos:.3f}mm.png"), save_frame)
+            gray = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY) if frame.ndim == 3 else frame
+            m = self.metric_fn(gray, self.roi)
+            m50 = _compute_mtf50(gray, self.roi, psf_mode=self.psf_mode)
             positions.append(pos)
             metrics.append(m)
+            mtf50s.append(m50)
 
         # find coarse peak
         best_idx = int(np.argmax(metrics))
@@ -269,18 +348,27 @@ class AutofocusWorker(QThread):
         for i, pos in enumerate(fine_pos):
             self.progress.emit(f"Fine {i+1}/{self.fine_steps}: {pos:.3f} mm")
             self.axis.move_absolute(pos, Units.LENGTH_MILLIMETRES, wait_until_idle=True)
-            time.sleep(0.05)
-            frame = self.cam.capture_raw()
-            m = self.metric_fn(frame, self.roi)
+            time.sleep(1.0)  # 1s mechanical settle
+            if self.cam.is_color:
+                frame = self.cam.capture_rgb()
+            else:
+                frame = self.cam.capture_raw()
+            if self.save_images_dir:
+                save_frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR) if frame.ndim == 3 else frame
+                cv2.imwrite(str(self.save_images_dir / f"fine_{i:03d}_{pos:.3f}mm.png"), save_frame)
+            gray = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY) if frame.ndim == 3 else frame
+            m = self.metric_fn(gray, self.roi)
+            m50 = _compute_mtf50(gray, self.roi, psf_mode=self.psf_mode)
             positions.append(pos)
             metrics.append(m)
+            mtf50s.append(m50)
 
         # move to best position overall
         best_overall = int(np.argmax(metrics))
         best_pos = positions[best_overall]
         self.axis.move_absolute(best_pos, Units.LENGTH_MILLIMETRES, wait_until_idle=True)
         self.progress.emit(f"Best focus: {best_pos:.3f} mm")
-        self.finished.emit(positions, metrics, best_pos)
+        self.finished.emit(positions, metrics, mtf50s, best_pos)
 
 
 # ── Main GUI ────────────────────────────────────────────────────────────────
@@ -436,6 +524,15 @@ class AutofocusGUI(QMainWindow):
         self._fine_spin.setRange(5, 50)
         self._fine_spin.setValue(10)
         af_lay.addWidget(self._fine_spin)
+
+        self._psf_mode_cb = QCheckBox("Image is PSF (point source)")
+        af_lay.addWidget(self._psf_mode_cb)
+
+        self._save_graph_cb = QCheckBox("Save graph data")
+        af_lay.addWidget(self._save_graph_cb)
+
+        self._save_images_cb = QCheckBox("Save images")
+        af_lay.addWidget(self._save_images_cb)
 
         self._af_btn = QPushButton("Autofocus")
         self._af_btn.clicked.connect(self._start_autofocus)
@@ -594,6 +691,16 @@ class AutofocusGUI(QMainWindow):
         self._metric_combo.setEnabled(False)
         self._stop_live()
 
+        # create save directory if saving images
+        save_dir = None
+        if self._save_images_cb.isChecked():
+            ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+            save_dir = Path("./autofocus_data") / ts
+            save_dir.mkdir(parents=True, exist_ok=True)
+            self._af_status.setText(f"Saving images to {save_dir}")
+
+        self._save_dir = save_dir  # store for graph data saving
+
         self._af_worker = AutofocusWorker(
             cam=self._cam,
             axis=self._axes[focus_axis_name],
@@ -603,28 +710,77 @@ class AutofocusGUI(QMainWindow):
             fine_steps=self._fine_spin.value(),
             roi=self._roi,
             metric_fn=FOCUS_METRICS[self._metric_combo.currentText()],
+            save_images_dir=save_dir,
+            psf_mode=self._psf_mode_cb.isChecked(),
         )
         self._af_worker.progress.connect(self._af_status.setText)
         self._af_worker.finished.connect(self._on_autofocus_done)
         self._af_worker.start()
 
-    def _on_autofocus_done(self, positions, metrics, best_pos):
+    def _on_autofocus_done(self, positions, metrics, mtf50s, best_pos):
         self._af_btn.setEnabled(True)
         self._metric_combo.setEnabled(True)
         self._af_status.setText(f"Best focus: {best_pos:.3f} mm")
         self._start_live()
-        self._show_focus_curve(positions, metrics, best_pos)
+        self._show_focus_curve(positions, metrics, mtf50s, best_pos)
 
-    def _show_focus_curve(self, positions, metrics, best_pos):
+        # save graph data if checkbox is checked
+        if self._save_graph_cb.isChecked():
+            save_dir = self._save_dir
+            if save_dir is None:
+                ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+                save_dir = Path("./autofocus_data") / ts
+                save_dir.mkdir(parents=True, exist_ok=True)
+
+            metric_name = self._metric_combo.currentText()
+
+            # CSV
+            csv_path = save_dir / "autofocus_data.csv"
+            with open(csv_path, "w", newline="") as f:
+                writer = csv.writer(f)
+                writer.writerow(["position_mm", metric_name, "mtf50_cycles_per_px"])
+                for pos, m, m50 in zip(positions, metrics, mtf50s):
+                    writer.writerow([f"{pos:.4f}", f"{m:.6f}", f"{m50:.6f}"])
+
+            # JSON
+            json_path = save_dir / "autofocus_data.json"
+            data = {
+                "best_pos_mm": best_pos,
+                "metric": metric_name,
+                "positions_mm": positions,
+                "metric_values": metrics,
+                "mtf50_values": mtf50s,
+            }
+            json_path.write_text(json.dumps(data, indent=2))
+
+            self._af_status.setText(f"Best: {best_pos:.3f} mm — data saved to {save_dir}")
+
+    def _show_focus_curve(self, positions, metrics, mtf50s, best_pos):
         metric_name = self._metric_combo.currentText()
-        fig, ax = plt.subplots(figsize=(8, 5))
-        ax.plot(positions, metrics, "o-", markersize=4)
-        ax.axvline(best_pos, color="r", linestyle="--", label=f"Best: {best_pos:.3f} mm")
-        ax.set_xlabel("Position (mm)")
-        ax.set_ylabel(metric_name)
-        ax.set_title(f"Autofocus Curve ({metric_name})")
-        ax.legend()
-        ax.grid(True, alpha=0.3)
+        fig, ax1 = plt.subplots(figsize=(10, 5))
+
+        # focus metric on left y-axis
+        color1 = "tab:blue"
+        ax1.plot(positions, metrics, "o-", markersize=4, color=color1, label=metric_name)
+        ax1.axvline(best_pos, color="r", linestyle="--", label=f"Best: {best_pos:.3f} mm")
+        ax1.set_xlabel("Position (mm)")
+        ax1.set_ylabel(metric_name, color=color1)
+        ax1.tick_params(axis="y", labelcolor=color1)
+        ax1.grid(True, alpha=0.3)
+
+        # MTF50 on right y-axis
+        ax2 = ax1.twinx()
+        color2 = "tab:orange"
+        ax2.plot(positions, mtf50s, "s-", markersize=3, color=color2, alpha=0.7, label="MTF50")
+        ax2.set_ylabel("MTF50 (cycles/pixel)", color=color2)
+        ax2.tick_params(axis="y", labelcolor=color2)
+
+        # combined legend
+        lines1, labels1 = ax1.get_legend_handles_labels()
+        lines2, labels2 = ax2.get_legend_handles_labels()
+        ax1.legend(lines1 + lines2, labels1 + labels2, loc="best")
+
+        ax1.set_title(f"Autofocus Curve ({metric_name} + MTF50)")
         plt.tight_layout()
         plt.show(block=False)
 

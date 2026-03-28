@@ -15,7 +15,7 @@ from datetime import datetime, timezone
 
 import numpy as np
 
-from .camera import DahengCamera, TRIGGER_LINE3
+from .camera import DahengCamera, TRIGGER_LINE2
 from .xpr_controller import XPRController
 
 log = logging.getLogger(__name__)
@@ -44,7 +44,7 @@ class ImagingSystem:
         Which camera trigger input line to use for hardware triggering.
     """
 
-    def __init__(self, hardware_trigger: bool = False, trigger_line: int = TRIGGER_LINE3):
+    def __init__(self, hardware_trigger: bool = True, trigger_line: int = TRIGGER_LINE2):
         log.info("Connecting to hardware...")
         self._hardware_trigger = hardware_trigger
         self._cam = DahengCamera(hardware_trigger=hardware_trigger, trigger_line=trigger_line)

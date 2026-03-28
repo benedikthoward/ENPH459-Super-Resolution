@@ -12,7 +12,7 @@ TRIGGER_LINE3 = 4   # GPIO (3.3V logic)
 
 class DahengCamera:
     def __init__(self, device_index: int = 0, hardware_trigger: bool = False,
-                 trigger_line: int = TRIGGER_LINE3):
+                 trigger_line: int = TRIGGER_LINE2):
         self._dm = gx.DeviceManager()
         dev_num, dev_info_list = self._dm.update_device_list()
         if dev_num == 0:
