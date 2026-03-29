@@ -231,3 +231,4 @@ target/
 *.profdata
 
 stability_data/
+autofocus_data/autofocusdata_rgb_mar28_barcodes.zip
