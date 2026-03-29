@@ -16,6 +16,7 @@ dependencies = [
     "iai-gxipy",
     "scikit-image",
     "pymupdf",
+    "vmbpy>=1.2.1",
 ]
 
 [tool.uv]

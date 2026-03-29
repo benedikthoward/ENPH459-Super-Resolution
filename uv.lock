@@ -239,6 +239,7 @@ dependencies = [
     { name = "pypylon" },
     { name = "pyqt5" },
     { name = "scikit-image" },
+    { name = "vmbpy" },
     { name = "zaber-motion" },
 ]
 
@@ -254,6 +255,7 @@ requires-dist = [
     { name = "pypylon" },
     { name = "pyqt5" },
     { name = "scikit-image" },
+    { name = "vmbpy", specifier = ">=1.2.1" },
     { name = "zaber-motion" },
 ]
 
@@ -1147,6 +1149,16 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/72/94/1a15dd82efb362ac84269196e94cf00f187f7ed21c242792a923cdb1c61f/typing_extensions-4.15.0.tar.gz", hash = "sha256:0cea48d173cc12fa28ecabc3b837ea3cf6f38c6d1136f85cbaaf598984861466", size = 109391, upload-time = "2025-08-25T13:49:26.313Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/18/67/36e9267722cc04a6b9f15c7f3441c2363321a3ea07da7ae0c0707beb2a9c/typing_extensions-4.15.0-py3-none-any.whl", hash = "sha256:f0fa19c6845758ab08074a0cfa8b7aecb71c999ca73d62883bc25cc018c4e548", size = 44614, upload-time = "2025-08-25T13:49:24.86Z" },
+]
+
+[[package]]
+name = "vmbpy"
+version = "1.2.1"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/01/8b/e1906043bc986e3b1ab445fa7f04e5dfbe4598feba96f6c75876b8bccf9c/vmbpy-1.2.1-py3-none-manylinux_2_27_aarch64.whl", hash = "sha256:6e15a1f816e11966bacdb4ef254c68b498f49c0ebfd83efc2bfdfa464af3833e", size = 2647937, upload-time = "2026-03-09T09:50:29.951Z" },
+    { url = "https://files.pythonhosted.org/packages/3e/2c/23ae1497d6b692683f33a09d34ebd275e309536f9d87d815a14fd0d5820f/vmbpy-1.2.1-py3-none-manylinux_2_27_x86_64.whl", hash = "sha256:d2c3c50d08ee551578142ba802123be435cd050fc8620ad2447956bb76dd89d9", size = 2774047, upload-time = "2026-03-09T09:50:44.667Z" },
+    { url = "https://files.pythonhosted.org/packages/8a/4a/943ab120b320d5594ece896c26779654f4356ecfca954c30b875f580713b/vmbpy-1.2.1-py3-none-win_amd64.whl", hash = "sha256:be6439556d34c7e2645593abfe9a0e9d3329d7cde453ed3514fcee3e71acf050", size = 1481509, upload-time = "2026-03-09T09:49:58.722Z" },
 ]
 
 [[package]]
