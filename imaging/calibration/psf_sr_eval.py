@@ -120,6 +120,11 @@ def extract_psf(img, center, radius, bg_percentile=50.0):
     bg = np.percentile(roi[mask], bg_percentile)
     roi -= bg
     roi[roi < 0] = 0
+    # Threshold sparse noise floor — handles integer-valued cameras where
+    # median bg = 0 but isolated 1-count pixels remain after subtraction.
+    bg_std = np.std(roi[mask])
+    if bg_std > 0:
+        roi[roi < 3.0 * bg_std] = 0
     return roi
 
 

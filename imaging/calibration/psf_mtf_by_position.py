@@ -66,6 +66,13 @@ def extract_psf(img, center, radius, bg_percentile=50.0):
 
     roi -= bg
     roi[roi < 0] = 0
+
+    # Threshold sparse noise floor — handles integer-valued cameras where
+    # median bg = 0 but isolated 1-count pixels remain after subtraction.
+    bg_std = np.std(roi[mask])
+    if bg_std > 0:
+        roi[roi < 3.0 * bg_std] = 0
+
     return roi
 
 
@@ -217,6 +224,10 @@ def analyse_position(paths, crop_radius, pixel_pitch_um, bg_percentile=50.0):
         psf = extract_psf(img, peak, crop_radius, bg_percentile)
         raw_psfs.append(psf)
 
+    # Naive stack: simple average WITHOUT sub-pixel alignment.
+    # Its MTF degrades for positions with a spread of shifts (shows real blurring).
+    psf_naive = np.array(raw_psfs).mean(axis=0)
+
     target_c = np.array([crop_radius, crop_radius], dtype=float)
     aligned_psfs = []
     for psf in raw_psfs:
@@ -284,10 +295,16 @@ def analyse_position(paths, crop_radius, pixel_pitch_um, bg_percentile=50.0):
     com_avg = subpixel_centre(psf_avg)
     radii_psf, psf_profile_avg = radial_average(psf_avg, com_avg, crop_radius)
 
+    # Naive-stack MTF
+    freq_naive, mtf_naive_r, _, _, _ = compute_mtf(psf_naive, pixel_pitch_um)
+    mtf50_naive = mtf_at_fraction(freq_naive, mtf_naive_r, 0.5)
+    mtf10_naive = mtf_at_fraction(freq_naive, mtf_naive_r, 0.1)
+
     return dict(
         n_images=n,
         psf_avg=psf_avg,
         psf_std=psf_std,
+        psf_naive=psf_naive,
         psf_fit=fit_img,
         psf_fit_params=np.array(popt) if popt is not None else None,
         com_avg=np.array(com_avg),
@@ -309,6 +326,11 @@ def analyse_position(paths, crop_radius, pixel_pitch_um, bg_percentile=50.0):
         per_image_mtf10=all_mtf10,
         per_image_sigma_x=np.array(all_sx) if all_sx else np.array([]),
         per_image_sigma_y=np.array(all_sy) if all_sy else np.array([]),
+        freq_naive=freq_naive,
+        mtf_naive=mtf_naive_r,
+        mtf50_naive=mtf50_naive,
+        mtf10_naive=mtf10_naive,
+        raw_psfs=raw_psfs,
     )
 
 
@@ -448,12 +470,21 @@ def plot_position(res, pos_id, title_suffix="", zoom=10, output_path=None):
     # (2,1) Radial MTF
     ax = fig.add_subplot(gs[2, 1])
     valid = freq_ref <= nyquist
-    ax.plot(freq_ref[valid], mtf_mean[valid], 'k-', lw=1.5, label='Mean')
+    ax.plot(freq_ref[valid], mtf_mean[valid], 'k-', lw=1.5, label='Aligned avg')
     if n > 1:
         ax.fill_between(freq_ref[valid],
                         np.clip(mtf_mean[valid] - mtf_std[valid], 0, None),
                         np.clip(mtf_mean[valid] + mtf_std[valid], None, 1.05),
                         alpha=0.25, color='steelblue', label='+/-1 std')
+    # Naive-stack MTF: blurred by shift spread — meaningful difference across positions
+    freq_n = res.get('freq_naive')
+    mtf_n  = res.get('mtf_naive')
+    mtf50_n = res.get('mtf50_naive', np.nan)
+    if freq_n is not None and mtf_n is not None:
+        valid_n = freq_n <= nyquist
+        ax.plot(freq_n[valid_n], mtf_n[valid_n], 'g--', lw=1.2,
+                label='Naive stack (MTF50=%.3f %s)' % (
+                    mtf50_n if not np.isnan(mtf50_n) else 0, freq_label))
     ax.axhline(0.5, color='orange', ls='--', alpha=0.6,
                label='MTF50 = %.3f %s' % (mtf50, freq_label))
     ax.axhline(0.1, color='red', ls='--', alpha=0.6,
@@ -521,17 +552,17 @@ def plot_comparison(results_by_pos, output_path=None):
     fig.suptitle("PSF/MTF comparison across shift positions", fontsize=14, fontweight='bold')
     outer = gridspec.GridSpec(2, 2, figure=fig, hspace=0.35, wspace=0.3)
 
-    # --- Top-left: radial MTF overlay ---
+    # --- Top-left: radial MTF overlay (naive stack — shows real blurring) ---
     ax_mtf = fig.add_subplot(outer[0, 0])
     for pos in positions:
         r = results_by_pos[pos]
-        freq = r['freq']
-        mtf_mean = r['mtf_mean']
+        freq_n = r.get('freq_naive', r['freq'])
+        mtf_n  = r.get('mtf_naive',  r['mtf_mean'])
         nyquist = r['nyquist']
         freq_label = r['freq_label']
-        valid = freq <= nyquist
+        valid = freq_n <= nyquist
         label = "pos%d %s (n=%d)" % (pos, POSITION_LABELS.get(pos, ''), r['n_images'])
-        ax_mtf.plot(freq[valid], mtf_mean[valid],
+        ax_mtf.plot(freq_n[valid], mtf_n[valid],
                     color=colors[pos], lw=1.5 if pos == 4 else 0.9,
                     ls='-' if pos == 4 else '--', label=label)
 
@@ -539,7 +570,7 @@ def plot_comparison(results_by_pos, output_path=None):
     ax_mtf.axhline(0.1, color='gray', ls=':', alpha=0.5)
     ax_mtf.set_xlabel("Spatial frequency (%s)" % freq_label)
     ax_mtf.set_ylabel("MTF")
-    ax_mtf.set_title("Radial MTF – all positions")
+    ax_mtf.set_title("Naive-stack MTF – all positions\n(unaligned avg; shows shift blurring)")
     ax_mtf.set_xlim(0, nyquist)
     ax_mtf.set_ylim(0, 1.05)
     ax_mtf.legend(fontsize=6, loc='upper right')
@@ -555,14 +586,11 @@ def plot_comparison(results_by_pos, output_path=None):
 
     for pos in positions:
         r = results_by_pos[pos]
-        v50 = r['per_image_mtf50']
-        v10 = r['per_image_mtf10']
-        v50 = v50[~np.isnan(v50)]
-        v10 = v10[~np.isnan(v10)]
-        mtf50_means.append(v50.mean() if len(v50) > 0 else np.nan)
-        mtf50_stds.append(v50.std() if len(v50) > 1 else 0.0)
-        mtf10_means.append(v10.mean() if len(v10) > 0 else np.nan)
-        mtf10_stds.append(v10.std() if len(v10) > 1 else 0.0)
+        # Use naive MTF50/MTF10 — reflects real blur across shift positions
+        mtf50_means.append(r.get('mtf50_naive', r['mtf50']))
+        mtf50_stds.append(0.0)
+        mtf10_means.append(r.get('mtf10_naive', r['mtf10']))
+        mtf10_stds.append(0.0)
 
     x = np.arange(n_pos)
     width = 0.35
@@ -575,7 +603,7 @@ def plot_comparison(results_by_pos, output_path=None):
         ["p%d\n%s" % (p, POSITION_LABELS.get(p, '')) for p in positions],
         fontsize=7)
     ax_bar.set_ylabel("Spatial frequency (%s)" % freq_label)
-    ax_bar.set_title("MTF50 / MTF10 by position (mean ± std)")
+    ax_bar.set_title("Naive-stack MTF50 / MTF10 by position")
     ax_bar.legend(fontsize=8)
     ax_bar.grid(True, alpha=0.3, axis='y')
 
@@ -603,6 +631,55 @@ def plot_comparison(results_by_pos, output_path=None):
     if output_path:
         plt.savefig(output_path, dpi=180)
         print("Saved comparison figure: %s" % output_path)
+    plt.close(fig)
+
+
+# ---------------------------------------------------------------------------
+# Individual-image figure (for pos4 reference inspection)
+# ---------------------------------------------------------------------------
+
+def plot_individual_psfs(raw_psfs, pixel_pitch_um, n_show=6, zoom=15, output_path=None):
+    """Show the first N raw (unaligned) PSFs side-by-side with their MTFs."""
+    n_show = min(n_show, len(raw_psfs))
+    if n_show == 0:
+        return
+
+    fig, axes = plt.subplots(2, n_show, figsize=(3.5 * n_show, 7),
+                             constrained_layout=True)
+    if n_show == 1:
+        axes = np.array(axes).reshape(2, 1)
+    fig.suptitle("Individual PSF images (pos4 / reference)", fontsize=12, fontweight='bold')
+
+    for i, psf in enumerate(raw_psfs[:n_show]):
+        com = subpixel_centre(psf)
+        crop = zoom_crop(psf, com, zoom)
+
+        # Top row: PSF image
+        ax_img = axes[0, i]
+        ax_img.imshow(crop, cmap='inferno', vmin=0, vmax=psf.max(),
+                      origin='lower', interpolation='nearest',
+                      extent=[-zoom, zoom, -zoom, zoom])
+        ax_img.set_title("Image %d" % (i + 1), fontsize=9)
+        ax_img.set_xlabel("px"); ax_img.set_ylabel("px")
+
+        # Bottom row: radial MTF
+        ax_mtf = axes[1, i]
+        freq, mtf_r, _, freq_label, nyquist = compute_mtf(psf, pixel_pitch_um)
+        valid = freq <= nyquist
+        ax_mtf.plot(freq[valid], mtf_r[valid], 'k-', lw=1.2)
+        mtf50 = mtf_at_fraction(freq, mtf_r, 0.5)
+        ax_mtf.axhline(0.5, color='orange', ls='--', alpha=0.6,
+                       label='MTF50=%.3f' % (mtf50 if not np.isnan(mtf50) else 0))
+        ax_mtf.set_xlim(0, nyquist)
+        ax_mtf.set_ylim(0, 1.05)
+        ax_mtf.set_xlabel("Freq (%s)" % freq_label, fontsize=7)
+        ax_mtf.set_ylabel("MTF", fontsize=7)
+        ax_mtf.legend(fontsize=7)
+        ax_mtf.grid(True, alpha=0.3)
+
+    if output_path:
+        plt.savefig(output_path, dpi=180)
+        print("  Saved %s" % output_path)
     plt.close(fig)
 
 
@@ -715,16 +792,24 @@ def main():
         fig_out = os.path.join(out_dir, "psf_mtf_pos%d.png" % pos)
         plot_position(res, pos, zoom=args.psf_zoom, output_path=fig_out)
 
+        # For the reference position, also show individual images
+        if pos == 4 and len(res.get('raw_psfs', [])) > 0:
+            ind_out = os.path.join(out_dir, "psf_individual_pos4.png")
+            plot_individual_psfs(res['raw_psfs'], args.pixel_pitch_um,
+                                 n_show=min(6, len(res['raw_psfs'])),
+                                 zoom=args.psf_zoom, output_path=ind_out)
+
     # Comparison figure
     comp_out = os.path.join(out_dir, "psf_mtf_comparison.png")
     plot_comparison(results_by_pos, output_path=comp_out)
 
     # Save numerical data
     save_dict = {}
+    skip_keys = {'raw_psfs'}  # lists of arrays — not suitable for npz
     for pos, res in results_by_pos.items():
         prefix = "pos%d_" % pos
         for k, v in res.items():
-            if v is None:
+            if k in skip_keys or v is None:
                 continue
             if isinstance(v, np.ndarray):
                 save_dict[prefix + k] = v
