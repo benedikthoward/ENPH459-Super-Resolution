@@ -1,0 +1,49 @@
+{
+  "tilt_x_deg": 0.28,
+  "tilt_y_deg": 0.28,
+  "settling_time_ms": 20,
+  "positions": [
+    {
+      "index": 0,
+      "label": "(-x,+y)",
+      "commanded_x_deg": -0.28,
+      "commanded_y_deg": 0.28
+    },
+    {
+      "index": 1,
+      "label": "(+x,+y)",
+      "commanded_x_deg": 0.28,
+      "commanded_y_deg": 0.28
+    },
+    {
+      "index": 2,
+      "label": "(-x,-y)",
+      "commanded_x_deg": -0.28,
+      "commanded_y_deg": -0.28
+    },
+    {
+      "index": 3,
+      "label": "(+x,-y)",
+      "commanded_x_deg": 0.28,
+      "commanded_y_deg": -0.28
+    }
+  ],
+  "expected_shifts": {
+    "(-x,+y)": {
+      "dx_px": -0.8677,
+      "dy_px": 0.9445
+    },
+    "(+x,+y)": {
+      "dx_px": 0.9282,
+      "dy_px": 0.9794
+    },
+    "(-x,-y)": {
+      "dx_px": -0.9106,
+      "dy_px": -0.9596
+    },
+    "(+x,-y)": {
+      "dx_px": 0.8738,
+      "dy_px": -0.9712
+    }
+  }
+}

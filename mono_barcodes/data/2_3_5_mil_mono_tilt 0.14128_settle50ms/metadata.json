@@ -1,0 +1,33 @@
+{
+  "camera_type": "mono",
+  "settling_time_ms": 50,
+  "positions": [
+    {
+      "index": 0,
+      "label": "(-x,+y)",
+      "commanded_x_deg": -0.14391,
+      "commanded_y_deg": 0.14391
+    },
+    {
+      "index": 1,
+      "label": "(+x,+y)",
+      "commanded_x_deg": 0.14391,
+      "commanded_y_deg": 0.14391
+    },
+    {
+      "index": 2,
+      "label": "(-x,-y)",
+      "commanded_x_deg": -0.14391,
+      "commanded_y_deg": -0.14391
+    },
+    {
+      "index": 3,
+      "label": "(+x,-y)",
+      "commanded_x_deg": 0.14391,
+      "commanded_y_deg": -0.14391
+    }
+  ],
+  "mode": "nominal",
+  "nominal_tilt_deg": 0.14391,
+  "target_shift_px": 0.5
+}

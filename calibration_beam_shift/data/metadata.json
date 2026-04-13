@@ -1,0 +1,2437 @@
+{
+  "description": "Data taken on 20260326_152815 of a backlit 5um pinhole at optimal focus position with max intensity 248/255. This experiment measures pixel shift of a pinhole image as a function of XPR tilt angle. A 3x3 grid of positions is visited at each tilt value: (-dx,+dy), (0,+dy), (+dx,+dy), (-dx,0), (0,0), (+dx,0), (-dx,-dy), (0,-dy), (+dx,-dy). Position (0,0) is the reference. X and Y axes are swept independently. Sub-pixel center is found via 2D Gaussian PSF fit.",
+  "params": {
+    "tilt_x_angles_deg": [
+      0.02,
+      0.039999999999999994,
+      0.06,
+      0.07999999999999999,
+      0.09999999999999999,
+      0.11999999999999998,
+      0.13999999999999999,
+      0.15999999999999998,
+      0.17999999999999997,
+      0.19999999999999996,
+      0.21999999999999995,
+      0.23999999999999996,
+      0.25999999999999995,
+      0.27999999999999997,
+      0.3
+    ],
+    "tilt_y_angles_deg": [
+      0.02,
+      0.039999999999999994,
+      0.06,
+      0.07999999999999999,
+      0.09999999999999999,
+      0.11999999999999998,
+      0.13999999999999999,
+      0.15999999999999998,
+      0.17999999999999997,
+      0.19999999999999996,
+      0.21999999999999995,
+      0.23999999999999996,
+      0.25999999999999995,
+      0.27999999999999997,
+      0.3
+    ],
+    "settling_time_ms": 10,
+    "num_repeats": 5,
+    "psf_crop_radius": 50,
+    "exposure_us": 28996.0,
+    "gain_db": 0.0,
+    "camera": {
+      "width": 2048,
+      "height": 1536,
+      "is_color": false
+    }
+  },
+  "grid_labels": [
+    "(-x,+y)",
+    "(0,+y)",
+    "(+x,+y)",
+    "(-x, 0)",
+    "(0, 0)",
+    "(+x, 0)",
+    "(-x,-y)",
+    "(0,-y)",
+    "(+x,-y)"
+  ],
+  "timestamp": "20260326_152815",
+  "images": [
+    "sweepx_tilt0.02000deg/pos0_(-x,+y).png",
+    "sweepx_tilt0.02000deg/pos1_(0,+y).png",
+    "sweepx_tilt0.02000deg/pos2_(+x,+y).png",
+    "sweepx_tilt0.02000deg/pos3_(-x,0).png",
+    "sweepx_tilt0.02000deg/pos4_(0,0).png",
+    "sweepx_tilt0.02000deg/pos5_(+x,0).png",
+    "sweepx_tilt0.02000deg/pos6_(-x,-y).png",
+    "sweepx_tilt0.02000deg/pos7_(0,-y).png",
+    "sweepx_tilt0.02000deg/pos8_(+x,-y).png",
+    "sweepx_tilt0.04000deg/pos0_(-x,+y).png",
+    "sweepx_tilt0.04000deg/pos1_(0,+y).png",
+    "sweepx_tilt0.04000deg/pos2_(+x,+y).png",
+    "sweepx_tilt0.04000deg/pos3_(-x,0).png",
+    "sweepx_tilt0.04000deg/pos4_(0,0).png",
+    "sweepx_tilt0.04000deg/pos5_(+x,0).png",
+    "sweepx_tilt0.04000deg/pos6_(-x,-y).png",
+    "sweepx_tilt0.04000deg/pos7_(0,-y).png",
+    "sweepx_tilt0.04000deg/pos8_(+x,-y).png",
+    "sweepx_tilt0.06000deg/pos0_(-x,+y).png",
+    "sweepx_tilt0.06000deg/pos1_(0,+y).png",
+    "sweepx_tilt0.06000deg/pos2_(+x,+y).png",
+    "sweepx_tilt0.06000deg/pos3_(-x,0).png",
+    "sweepx_tilt0.06000deg/pos4_(0,0).png",
+    "sweepx_tilt0.06000deg/pos5_(+x,0).png",
+    "sweepx_tilt0.06000deg/pos6_(-x,-y).png",
+    "sweepx_tilt0.06000deg/pos7_(0,-y).png",
+    "sweepx_tilt0.06000deg/pos8_(+x,-y).png",
+    "sweepx_tilt0.08000deg/pos0_(-x,+y).png",
+    "sweepx_tilt0.08000deg/pos1_(0,+y).png",
+    "sweepx_tilt0.08000deg/pos2_(+x,+y).png",
+    "sweepx_tilt0.08000deg/pos3_(-x,0).png",
+    "sweepx_tilt0.08000deg/pos4_(0,0).png",
+    "sweepx_tilt0.08000deg/pos5_(+x,0).png",
+    "sweepx_tilt0.08000deg/pos6_(-x,-y).png",
+    "sweepx_tilt0.08000deg/pos7_(0,-y).png",
+    "sweepx_tilt0.08000deg/pos8_(+x,-y).png",
+    "sweepx_tilt0.10000deg/pos0_(-x,+y).png",
+    "sweepx_tilt0.10000deg/pos1_(0,+y).png",
+    "sweepx_tilt0.10000deg/pos2_(+x,+y).png",
+    "sweepx_tilt0.10000deg/pos3_(-x,0).png",
+    "sweepx_tilt0.10000deg/pos4_(0,0).png",
+    "sweepx_tilt0.10000deg/pos5_(+x,0).png",
+    "sweepx_tilt0.10000deg/pos6_(-x,-y).png",
+    "sweepx_tilt0.10000deg/pos7_(0,-y).png",
+    "sweepx_tilt0.10000deg/pos8_(+x,-y).png",
+    "sweepx_tilt0.12000deg/pos0_(-x,+y).png",
+    "sweepx_tilt0.12000deg/pos1_(0,+y).png",
+    "sweepx_tilt0.12000deg/pos2_(+x,+y).png",
+    "sweepx_tilt0.12000deg/pos3_(-x,0).png",
+    "sweepx_tilt0.12000deg/pos4_(0,0).png",
+    "sweepx_tilt0.12000deg/pos5_(+x,0).png",
+    "sweepx_tilt0.12000deg/pos6_(-x,-y).png",
+    "sweepx_tilt0.12000deg/pos7_(0,-y).png",
+    "sweepx_tilt0.12000deg/pos8_(+x,-y).png",
+    "sweepx_tilt0.14000deg/pos0_(-x,+y).png",
+    "sweepx_tilt0.14000deg/pos1_(0,+y).png",
+    "sweepx_tilt0.14000deg/pos2_(+x,+y).png",
+    "sweepx_tilt0.14000deg/pos3_(-x,0).png",
+    "sweepx_tilt0.14000deg/pos4_(0,0).png",
+    "sweepx_tilt0.14000deg/pos5_(+x,0).png",
+    "sweepx_tilt0.14000deg/pos6_(-x,-y).png",
+    "sweepx_tilt0.14000deg/pos7_(0,-y).png",
+    "sweepx_tilt0.14000deg/pos8_(+x,-y).png",
+    "sweepx_tilt0.16000deg/pos0_(-x,+y).png",
+    "sweepx_tilt0.16000deg/pos1_(0,+y).png",
+    "sweepx_tilt0.16000deg/pos2_(+x,+y).png",
+    "sweepx_tilt0.16000deg/pos3_(-x,0).png",
+    "sweepx_tilt0.16000deg/pos4_(0,0).png",
+    "sweepx_tilt0.16000deg/pos5_(+x,0).png",
+    "sweepx_tilt0.16000deg/pos6_(-x,-y).png",
+    "sweepx_tilt0.16000deg/pos7_(0,-y).png",
+    "sweepx_tilt0.16000deg/pos8_(+x,-y).png",
+    "sweepx_tilt0.18000deg/pos0_(-x,+y).png",
+    "sweepx_tilt0.18000deg/pos1_(0,+y).png",
+    "sweepx_tilt0.18000deg/pos2_(+x,+y).png",
+    "sweepx_tilt0.18000deg/pos3_(-x,0).png",
+    "sweepx_tilt0.18000deg/pos4_(0,0).png",
+    "sweepx_tilt0.18000deg/pos5_(+x,0).png",
+    "sweepx_tilt0.18000deg/pos6_(-x,-y).png",
+    "sweepx_tilt0.18000deg/pos7_(0,-y).png",
+    "sweepx_tilt0.18000deg/pos8_(+x,-y).png",
+    "sweepx_tilt0.20000deg/pos0_(-x,+y).png",
+    "sweepx_tilt0.20000deg/pos1_(0,+y).png",
+    "sweepx_tilt0.20000deg/pos2_(+x,+y).png",
+    "sweepx_tilt0.20000deg/pos3_(-x,0).png",
+    "sweepx_tilt0.20000deg/pos4_(0,0).png",
+    "sweepx_tilt0.20000deg/pos5_(+x,0).png",
+    "sweepx_tilt0.20000deg/pos6_(-x,-y).png",
+    "sweepx_tilt0.20000deg/pos7_(0,-y).png",
+    "sweepx_tilt0.20000deg/pos8_(+x,-y).png",
+    "sweepx_tilt0.22000deg/pos0_(-x,+y).png",
+    "sweepx_tilt0.22000deg/pos1_(0,+y).png",
+    "sweepx_tilt0.22000deg/pos2_(+x,+y).png",
+    "sweepx_tilt0.22000deg/pos3_(-x,0).png",
+    "sweepx_tilt0.22000deg/pos4_(0,0).png",
+    "sweepx_tilt0.22000deg/pos5_(+x,0).png",
+    "sweepx_tilt0.22000deg/pos6_(-x,-y).png",
+    "sweepx_tilt0.22000deg/pos7_(0,-y).png",
+    "sweepx_tilt0.22000deg/pos8_(+x,-y).png",
+    "sweepx_tilt0.24000deg/pos0_(-x,+y).png",
+    "sweepx_tilt0.24000deg/pos1_(0,+y).png",
+    "sweepx_tilt0.24000deg/pos2_(+x,+y).png",
+    "sweepx_tilt0.24000deg/pos3_(-x,0).png",
+    "sweepx_tilt0.24000deg/pos4_(0,0).png",
+    "sweepx_tilt0.24000deg/pos5_(+x,0).png",
+    "sweepx_tilt0.24000deg/pos6_(-x,-y).png",
+    "sweepx_tilt0.24000deg/pos7_(0,-y).png",
+    "sweepx_tilt0.24000deg/pos8_(+x,-y).png",
+    "sweepx_tilt0.26000deg/pos0_(-x,+y).png",
+    "sweepx_tilt0.26000deg/pos1_(0,+y).png",
+    "sweepx_tilt0.26000deg/pos2_(+x,+y).png",
+    "sweepx_tilt0.26000deg/pos3_(-x,0).png",
+    "sweepx_tilt0.26000deg/pos4_(0,0).png",
+    "sweepx_tilt0.26000deg/pos5_(+x,0).png",
+    "sweepx_tilt0.26000deg/pos6_(-x,-y).png",
+    "sweepx_tilt0.26000deg/pos7_(0,-y).png",
+    "sweepx_tilt0.26000deg/pos8_(+x,-y).png",
+    "sweepx_tilt0.28000deg/pos0_(-x,+y).png",
+    "sweepx_tilt0.28000deg/pos1_(0,+y).png",
+    "sweepx_tilt0.28000deg/pos2_(+x,+y).png",
+    "sweepx_tilt0.28000deg/pos3_(-x,0).png",
+    "sweepx_tilt0.28000deg/pos4_(0,0).png",
+    "sweepx_tilt0.28000deg/pos5_(+x,0).png",
+    "sweepx_tilt0.28000deg/pos6_(-x,-y).png",
+    "sweepx_tilt0.28000deg/pos7_(0,-y).png",
+    "sweepx_tilt0.28000deg/pos8_(+x,-y).png",
+    "sweepx_tilt0.30000deg/pos0_(-x,+y).png",
+    "sweepx_tilt0.30000deg/pos1_(0,+y).png",
+    "sweepx_tilt0.30000deg/pos2_(+x,+y).png",
+    "sweepx_tilt0.30000deg/pos3_(-x,0).png",
+    "sweepx_tilt0.30000deg/pos4_(0,0).png",
+    "sweepx_tilt0.30000deg/pos5_(+x,0).png",
+    "sweepx_tilt0.30000deg/pos6_(-x,-y).png",
+    "sweepx_tilt0.30000deg/pos7_(0,-y).png",
+    "sweepx_tilt0.30000deg/pos8_(+x,-y).png",
+    "sweepy_tilt0.02000deg/pos0_(-x,+y).png",
+    "sweepy_tilt0.02000deg/pos1_(0,+y).png",
+    "sweepy_tilt0.02000deg/pos2_(+x,+y).png",
+    "sweepy_tilt0.02000deg/pos3_(-x,0).png",
+    "sweepy_tilt0.02000deg/pos4_(0,0).png",
+    "sweepy_tilt0.02000deg/pos5_(+x,0).png",
+    "sweepy_tilt0.02000deg/pos6_(-x,-y).png",
+    "sweepy_tilt0.02000deg/pos7_(0,-y).png",
+    "sweepy_tilt0.02000deg/pos8_(+x,-y).png",
+    "sweepy_tilt0.04000deg/pos0_(-x,+y).png",
+    "sweepy_tilt0.04000deg/pos1_(0,+y).png",
+    "sweepy_tilt0.04000deg/pos2_(+x,+y).png",
+    "sweepy_tilt0.04000deg/pos3_(-x,0).png",
+    "sweepy_tilt0.04000deg/pos4_(0,0).png",
+    "sweepy_tilt0.04000deg/pos5_(+x,0).png",
+    "sweepy_tilt0.04000deg/pos6_(-x,-y).png",
+    "sweepy_tilt0.04000deg/pos7_(0,-y).png",
+    "sweepy_tilt0.04000deg/pos8_(+x,-y).png",
+    "sweepy_tilt0.06000deg/pos0_(-x,+y).png",
+    "sweepy_tilt0.06000deg/pos1_(0,+y).png",
+    "sweepy_tilt0.06000deg/pos2_(+x,+y).png",
+    "sweepy_tilt0.06000deg/pos3_(-x,0).png",
+    "sweepy_tilt0.06000deg/pos4_(0,0).png",
+    "sweepy_tilt0.06000deg/pos5_(+x,0).png",
+    "sweepy_tilt0.06000deg/pos6_(-x,-y).png",
+    "sweepy_tilt0.06000deg/pos7_(0,-y).png",
+    "sweepy_tilt0.06000deg/pos8_(+x,-y).png",
+    "sweepy_tilt0.08000deg/pos0_(-x,+y).png",
+    "sweepy_tilt0.08000deg/pos1_(0,+y).png",
+    "sweepy_tilt0.08000deg/pos2_(+x,+y).png",
+    "sweepy_tilt0.08000deg/pos3_(-x,0).png",
+    "sweepy_tilt0.08000deg/pos4_(0,0).png",
+    "sweepy_tilt0.08000deg/pos5_(+x,0).png",
+    "sweepy_tilt0.08000deg/pos6_(-x,-y).png",
+    "sweepy_tilt0.08000deg/pos7_(0,-y).png",
+    "sweepy_tilt0.08000deg/pos8_(+x,-y).png",
+    "sweepy_tilt0.10000deg/pos0_(-x,+y).png",
+    "sweepy_tilt0.10000deg/pos1_(0,+y).png",
+    "sweepy_tilt0.10000deg/pos2_(+x,+y).png",
+    "sweepy_tilt0.10000deg/pos3_(-x,0).png",
+    "sweepy_tilt0.10000deg/pos4_(0,0).png",
+    "sweepy_tilt0.10000deg/pos5_(+x,0).png",
+    "sweepy_tilt0.10000deg/pos6_(-x,-y).png",
+    "sweepy_tilt0.10000deg/pos7_(0,-y).png",
+    "sweepy_tilt0.10000deg/pos8_(+x,-y).png",
+    "sweepy_tilt0.12000deg/pos0_(-x,+y).png",
+    "sweepy_tilt0.12000deg/pos1_(0,+y).png",
+    "sweepy_tilt0.12000deg/pos2_(+x,+y).png",
+    "sweepy_tilt0.12000deg/pos3_(-x,0).png",
+    "sweepy_tilt0.12000deg/pos4_(0,0).png",
+    "sweepy_tilt0.12000deg/pos5_(+x,0).png",
+    "sweepy_tilt0.12000deg/pos6_(-x,-y).png",
+    "sweepy_tilt0.12000deg/pos7_(0,-y).png",
+    "sweepy_tilt0.12000deg/pos8_(+x,-y).png",
+    "sweepy_tilt0.14000deg/pos0_(-x,+y).png",
+    "sweepy_tilt0.14000deg/pos1_(0,+y).png",
+    "sweepy_tilt0.14000deg/pos2_(+x,+y).png",
+    "sweepy_tilt0.14000deg/pos3_(-x,0).png",
+    "sweepy_tilt0.14000deg/pos4_(0,0).png",
+    "sweepy_tilt0.14000deg/pos5_(+x,0).png",
+    "sweepy_tilt0.14000deg/pos6_(-x,-y).png",
+    "sweepy_tilt0.14000deg/pos7_(0,-y).png",
+    "sweepy_tilt0.14000deg/pos8_(+x,-y).png",
+    "sweepy_tilt0.16000deg/pos0_(-x,+y).png",
+    "sweepy_tilt0.16000deg/pos1_(0,+y).png",
+    "sweepy_tilt0.16000deg/pos2_(+x,+y).png",
+    "sweepy_tilt0.16000deg/pos3_(-x,0).png",
+    "sweepy_tilt0.16000deg/pos4_(0,0).png",
+    "sweepy_tilt0.16000deg/pos5_(+x,0).png",
+    "sweepy_tilt0.16000deg/pos6_(-x,-y).png",
+    "sweepy_tilt0.16000deg/pos7_(0,-y).png",
+    "sweepy_tilt0.16000deg/pos8_(+x,-y).png",
+    "sweepy_tilt0.18000deg/pos0_(-x,+y).png",
+    "sweepy_tilt0.18000deg/pos1_(0,+y).png",
+    "sweepy_tilt0.18000deg/pos2_(+x,+y).png",
+    "sweepy_tilt0.18000deg/pos3_(-x,0).png",
+    "sweepy_tilt0.18000deg/pos4_(0,0).png",
+    "sweepy_tilt0.18000deg/pos5_(+x,0).png",
+    "sweepy_tilt0.18000deg/pos6_(-x,-y).png",
+    "sweepy_tilt0.18000deg/pos7_(0,-y).png",
+    "sweepy_tilt0.18000deg/pos8_(+x,-y).png",
+    "sweepy_tilt0.20000deg/pos0_(-x,+y).png",
+    "sweepy_tilt0.20000deg/pos1_(0,+y).png",
+    "sweepy_tilt0.20000deg/pos2_(+x,+y).png",
+    "sweepy_tilt0.20000deg/pos3_(-x,0).png",
+    "sweepy_tilt0.20000deg/pos4_(0,0).png",
+    "sweepy_tilt0.20000deg/pos5_(+x,0).png",
+    "sweepy_tilt0.20000deg/pos6_(-x,-y).png",
+    "sweepy_tilt0.20000deg/pos7_(0,-y).png",
+    "sweepy_tilt0.20000deg/pos8_(+x,-y).png",
+    "sweepy_tilt0.22000deg/pos0_(-x,+y).png",
+    "sweepy_tilt0.22000deg/pos1_(0,+y).png",
+    "sweepy_tilt0.22000deg/pos2_(+x,+y).png",
+    "sweepy_tilt0.22000deg/pos3_(-x,0).png",
+    "sweepy_tilt0.22000deg/pos4_(0,0).png",
+    "sweepy_tilt0.22000deg/pos5_(+x,0).png",
+    "sweepy_tilt0.22000deg/pos6_(-x,-y).png",
+    "sweepy_tilt0.22000deg/pos7_(0,-y).png",
+    "sweepy_tilt0.22000deg/pos8_(+x,-y).png",
+    "sweepy_tilt0.24000deg/pos0_(-x,+y).png",
+    "sweepy_tilt0.24000deg/pos1_(0,+y).png",
+    "sweepy_tilt0.24000deg/pos2_(+x,+y).png",
+    "sweepy_tilt0.24000deg/pos3_(-x,0).png",
+    "sweepy_tilt0.24000deg/pos4_(0,0).png",
+    "sweepy_tilt0.24000deg/pos5_(+x,0).png",
+    "sweepy_tilt0.24000deg/pos6_(-x,-y).png",
+    "sweepy_tilt0.24000deg/pos7_(0,-y).png",
+    "sweepy_tilt0.24000deg/pos8_(+x,-y).png",
+    "sweepy_tilt0.26000deg/pos0_(-x,+y).png",
+    "sweepy_tilt0.26000deg/pos1_(0,+y).png",
+    "sweepy_tilt0.26000deg/pos2_(+x,+y).png",
+    "sweepy_tilt0.26000deg/pos3_(-x,0).png",
+    "sweepy_tilt0.26000deg/pos4_(0,0).png",
+    "sweepy_tilt0.26000deg/pos5_(+x,0).png",
+    "sweepy_tilt0.26000deg/pos6_(-x,-y).png",
+    "sweepy_tilt0.26000deg/pos7_(0,-y).png",
+    "sweepy_tilt0.26000deg/pos8_(+x,-y).png",
+    "sweepy_tilt0.28000deg/pos0_(-x,+y).png",
+    "sweepy_tilt0.28000deg/pos1_(0,+y).png",
+    "sweepy_tilt0.28000deg/pos2_(+x,+y).png",
+    "sweepy_tilt0.28000deg/pos3_(-x,0).png",
+    "sweepy_tilt0.28000deg/pos4_(0,0).png",
+    "sweepy_tilt0.28000deg/pos5_(+x,0).png",
+    "sweepy_tilt0.28000deg/pos6_(-x,-y).png",
+    "sweepy_tilt0.28000deg/pos7_(0,-y).png",
+    "sweepy_tilt0.28000deg/pos8_(+x,-y).png",
+    "sweepy_tilt0.30000deg/pos0_(-x,+y).png",
+    "sweepy_tilt0.30000deg/pos1_(0,+y).png",
+    "sweepy_tilt0.30000deg/pos2_(+x,+y).png",
+    "sweepy_tilt0.30000deg/pos3_(-x,0).png",
+    "sweepy_tilt0.30000deg/pos4_(0,0).png",
+    "sweepy_tilt0.30000deg/pos5_(+x,0).png",
+    "sweepy_tilt0.30000deg/pos6_(-x,-y).png",
+    "sweepy_tilt0.30000deg/pos7_(0,-y).png",
+    "sweepy_tilt0.30000deg/pos8_(+x,-y).png"
+  ],
+  "x_sweep": {
+    "0.02000": {
+      "tilt_angle": 0.02,
+      "sweep_axis": "x",
+      "mean_shifts": {
+        "0": {
+          "pos": 0,
+          "label": "(-x,+y)",
+          "dx_mean": -0.10638158128422219,
+          "dx_std": 0.00996994919649683,
+          "dy_mean": -0.0013117142282453643,
+          "dy_std": 0.011110883725359427
+        },
+        "1": {
+          "pos": 1,
+          "label": "(0,+y)",
+          "dx_mean": -0.007206811818286951,
+          "dx_std": 0.007335197421295434,
+          "dy_mean": -0.0017069272630806155,
+          "dy_std": 0.010760921924435162
+        },
+        "2": {
+          "pos": 2,
+          "label": "(+x,+y)",
+          "dx_mean": 0.09088426833272933,
+          "dx_std": 0.007188890820076989,
+          "dy_mean": -0.00897261483555667,
+          "dy_std": 0.008066286991458178
+        },
+        "3": {
+          "pos": 3,
+          "label": "(-x, 0)",
+          "dx_mean": -0.09973281075776867,
+          "dx_std": 0.007069116917376368,
+          "dy_mean": -0.0016815329924838806,
+          "dy_std": 0.009360821774202928
+        },
+        "5": {
+          "pos": 5,
+          "label": "(+x, 0)",
+          "dx_mean": 0.09402897592121917,
+          "dx_std": 0.009610895938324036,
+          "dy_mean": -0.00816283650681271,
+          "dy_std": 0.010091114052094284
+        },
+        "6": {
+          "pos": 6,
+          "label": "(-x,-y)",
+          "dx_mean": -0.09254451210990737,
+          "dx_std": 0.010260370367432077,
+          "dy_mean": -0.006774237724653176,
+          "dy_std": 0.0030799259513895607
+        },
+        "7": {
+          "pos": 7,
+          "label": "(0,-y)",
+          "dx_mean": 0.0022727598834535456,
+          "dx_std": 0.01249147669443585,
+          "dy_mean": -0.016207010244011145,
+          "dy_std": 0.0056482136428568
+        },
+        "8": {
+          "pos": 8,
+          "label": "(+x,-y)",
+          "dx_mean": 0.10104339951762994,
+          "dx_std": 0.011346303217040714,
+          "dy_mean": -0.009131441406407249,
+          "dy_std": 0.0048245215270332365
+        }
+      }
+    },
+    "0.04000": {
+      "tilt_angle": 0.039999999999999994,
+      "sweep_axis": "x",
+      "mean_shifts": {
+        "0": {
+          "pos": 0,
+          "label": "(-x,+y)",
+          "dx_mean": -0.1753775192808007,
+          "dx_std": 0.013498258273102422,
+          "dy_mean": 0.007410075751795375,
+          "dy_std": 0.006992262807714097
+        },
+        "1": {
+          "pos": 1,
+          "label": "(0,+y)",
+          "dx_mean": 0.007881635469948379,
+          "dx_std": 0.014075073114874511,
+          "dy_mean": 0.0022046142383487675,
+          "dy_std": 0.010142271096502493
+        },
+        "2": {
+          "pos": 2,
+          "label": "(+x,+y)",
+          "dx_mean": 0.1312723580443617,
+          "dx_std": 0.009578574302756947,
+          "dy_mean": 0.03633823272414247,
+          "dy_std": 0.0067801814472494195
+        },
+        "3": {
+          "pos": 3,
+          "label": "(-x, 0)",
+          "dx_mean": -0.1777664356166042,
+          "dx_std": 0.0064299099373562475,
+          "dy_mean": 0.004804178343033527,
+          "dy_std": 0.009316271996465671
+        },
+        "5": {
+          "pos": 5,
+          "label": "(+x, 0)",
+          "dx_mean": 0.1331748643697665,
+          "dx_std": 0.00812434478448013,
+          "dy_mean": 0.034045960079924956,
+          "dy_std": 0.00584627254582742
+        },
+        "6": {
+          "pos": 6,
+          "label": "(-x,-y)",
+          "dx_mean": -0.17406150690189862,
+          "dx_std": 0.006275508269168637,
+          "dy_mean": -0.0005272717049138009,
+          "dy_std": 0.004943412913836915
+        },
+        "7": {
+          "pos": 7,
+          "label": "(0,-y)",
+          "dx_mean": 0.005495744919335266,
+          "dx_std": 0.008100106671404664,
+          "dy_mean": 0.002525406018207832,
+          "dy_std": 0.005884192271659768
+        },
+        "8": {
+          "pos": 8,
+          "label": "(+x,-y)",
+          "dx_mean": 0.13649347459409,
+          "dx_std": 0.012586644876169019,
+          "dy_mean": 0.03100546354899052,
+          "dy_std": 0.0076498150545684365
+        }
+      }
+    },
+    "0.06000": {
+      "tilt_angle": 0.06,
+      "sweep_axis": "x",
+      "mean_shifts": {
+        "0": {
+          "pos": 0,
+          "label": "(-x,+y)",
+          "dx_mean": -0.13111731412532207,
+          "dx_std": 0.11160547717960212,
+          "dy_mean": -0.02589247175435503,
+          "dy_std": 0.07028704694724723
+        },
+        "1": {
+          "pos": 1,
+          "label": "(0,+y)",
+          "dx_mean": 0.07854941833265912,
+          "dx_std": 0.11316373802850295,
+          "dy_mean": -0.05957821182594216,
+          "dy_std": 0.0616956605345491
+        },
+        "2": {
+          "pos": 2,
+          "label": "(+x,+y)",
+          "dx_mean": 0.2603119606730161,
+          "dx_std": 0.08306085008778098,
+          "dy_mean": -0.046654370277701675,
+          "dy_std": 0.09679120333152204
+        },
+        "3": {
+          "pos": 3,
+          "label": "(-x, 0)",
+          "dx_mean": -0.18190135321651724,
+          "dx_std": 0.045337941515514915,
+          "dy_mean": 0.016607758148666107,
+          "dy_std": 0.03475933023335007
+        },
+        "5": {
+          "pos": 5,
+          "label": "(+x, 0)",
+          "dx_mean": 0.19780823304777187,
+          "dx_std": 0.036679147407533544,
+          "dy_mean": -0.006988306986545467,
+          "dy_std": 0.10687325260255706
+        },
+        "6": {
+          "pos": 6,
+          "label": "(-x,-y)",
+          "dx_mean": -0.193797567819729,
+          "dx_std": 0.02582943735085301,
+          "dy_mean": 0.0010297460998799578,
+          "dy_std": 0.047754301966922846
+        },
+        "7": {
+          "pos": 7,
+          "label": "(0,-y)",
+          "dx_mean": -0.007743450686120923,
+          "dx_std": 0.0325779122333871,
+          "dy_mean": -0.011111030927395404,
+          "dy_std": 0.0646955113063087
+        },
+        "8": {
+          "pos": 8,
+          "label": "(+x,-y)",
+          "dx_mean": 0.18898867485254414,
+          "dx_std": 0.050158392258295645,
+          "dy_mean": 0.01680842688397206,
+          "dy_std": 0.09011941603662217
+        }
+      }
+    },
+    "0.08000": {
+      "tilt_angle": 0.07999999999999999,
+      "sweep_axis": "x",
+      "mean_shifts": {
+        "0": {
+          "pos": 0,
+          "label": "(-x,+y)",
+          "dx_mean": -0.27379181993678686,
+          "dx_std": 0.03215253866183399,
+          "dy_mean": -0.010162583309215734,
+          "dy_std": 0.018964781594401323
+        },
+        "1": {
+          "pos": 1,
+          "label": "(0,+y)",
+          "dx_mean": 0.011682922993850297,
+          "dx_std": 0.011548940358957045,
+          "dy_mean": -0.003557379520111681,
+          "dy_std": 0.018761325780334254
+        },
+        "2": {
+          "pos": 2,
+          "label": "(+x,+y)",
+          "dx_mean": 0.2684110689871432,
+          "dx_std": 0.06747058894341774,
+          "dy_mean": -0.09424297152665986,
+          "dy_std": 0.030271801104191042
+        },
+        "3": {
+          "pos": 3,
+          "label": "(-x, 0)",
+          "dx_mean": -0.2672383413239913,
+          "dx_std": 0.05968280102352969,
+          "dy_mean": -0.010487022307620464,
+          "dy_std": 0.01573435636771496
+        },
+        "5": {
+          "pos": 5,
+          "label": "(+x, 0)",
+          "dx_mean": 0.22424796756745308,
+          "dx_std": 0.009260734667807623,
+          "dy_mean": -0.11458110051880795,
+          "dy_std": 0.04184143637051319
+        },
+        "6": {
+          "pos": 6,
+          "label": "(-x,-y)",
+          "dx_mean": -0.37026619559092067,
+          "dx_std": 0.12381054823371176,
+          "dy_mean": 0.022708055663542837,
+          "dy_std": 0.09621496895029552
+        },
+        "7": {
+          "pos": 7,
+          "label": "(0,-y)",
+          "dx_mean": -0.09553162165866524,
+          "dx_std": 0.16563774500560313,
+          "dy_mean": 0.026311167145058788,
+          "dy_std": 0.04573336381525276
+        },
+        "8": {
+          "pos": 8,
+          "label": "(+x,-y)",
+          "dx_mean": 0.13819460903218897,
+          "dx_std": 0.17439705640417724,
+          "dy_mean": -0.0444678607742162,
+          "dy_std": 0.04323333122667589
+        }
+      }
+    },
+    "0.10000": {
+      "tilt_angle": 0.09999999999999999,
+      "sweep_axis": "x",
+      "mean_shifts": {
+        "0": {
+          "pos": 0,
+          "label": "(-x,+y)",
+          "dx_mean": -0.3318963482849995,
+          "dx_std": 0.04926450481212314,
+          "dy_mean": -0.04712400408286612,
+          "dy_std": 0.03493350096118454
+        },
+        "1": {
+          "pos": 1,
+          "label": "(0,+y)",
+          "dx_mean": 0.042814978000023984,
+          "dx_std": 0.08243048210367424,
+          "dy_mean": -0.024435523478291542,
+          "dy_std": 0.08150321390396695
+        },
+        "2": {
+          "pos": 2,
+          "label": "(+x,+y)",
+          "dx_mean": 0.31436302372239877,
+          "dx_std": 0.022711890166561312,
+          "dy_mean": -0.07191274987906127,
+          "dy_std": 0.05375611737822608
+        },
+        "3": {
+          "pos": 3,
+          "label": "(-x, 0)",
+          "dx_mean": -0.3711501916721772,
+          "dx_std": 0.02580636235233363,
+          "dy_mean": -0.05363116171401998,
+          "dy_std": 0.031991529953579005
+        },
+        "5": {
+          "pos": 5,
+          "label": "(+x, 0)",
+          "dx_mean": 0.31059382535590885,
+          "dx_std": 0.027403248575134594,
+          "dy_mean": -0.0638849228625304,
+          "dy_std": 0.09575095735180615
+        },
+        "6": {
+          "pos": 6,
+          "label": "(-x,-y)",
+          "dx_mean": -0.4251982004057936,
+          "dx_std": 0.17396952773996527,
+          "dy_mean": -0.0030629854226162934,
+          "dy_std": 0.1537352166384407
+        },
+        "7": {
+          "pos": 7,
+          "label": "(0,-y)",
+          "dx_mean": 0.0049202677495031825,
+          "dx_std": 0.03912034548501425,
+          "dy_mean": 0.00042372314760541485,
+          "dy_std": 0.026250024983537547
+        },
+        "8": {
+          "pos": 8,
+          "label": "(+x,-y)",
+          "dx_mean": 0.32106134226200994,
+          "dx_std": 0.1400160120565669,
+          "dy_mean": -0.10678607783472671,
+          "dy_std": 0.06709498624527198
+        }
+      }
+    },
+    "0.12000": {
+      "tilt_angle": 0.11999999999999998,
+      "sweep_axis": "x",
+      "mean_shifts": {
+        "0": {
+          "pos": 0,
+          "label": "(-x,+y)",
+          "dx_mean": -0.42094718891835325,
+          "dx_std": 0.009812835904598022,
+          "dy_mean": -0.062058164012364615,
+          "dy_std": 0.04111867443331014
+        },
+        "1": {
+          "pos": 1,
+          "label": "(0,+y)",
+          "dx_mean": 0.0075777203816869585,
+          "dx_std": 0.01611288779577023,
+          "dy_mean": -0.015634385867087985,
+          "dy_std": 0.016300818613987862
+        },
+        "2": {
+          "pos": 2,
+          "label": "(+x,+y)",
+          "dx_mean": 0.34681644263650924,
+          "dx_std": 0.011497934578244225,
+          "dy_mean": -0.13274865740800124,
+          "dy_std": 0.004339759641651508
+        },
+        "3": {
+          "pos": 3,
+          "label": "(-x, 0)",
+          "dx_mean": -0.42755332675719726,
+          "dx_std": 0.006681680048283562,
+          "dy_mean": -0.07868527622586044,
+          "dy_std": 0.025086914934358186
+        },
+        "5": {
+          "pos": 5,
+          "label": "(+x, 0)",
+          "dx_mean": 0.34747578776477894,
+          "dx_std": 0.010504555994460988,
+          "dy_mean": -0.11522332653983085,
+          "dy_std": 0.016507658084448536
+        },
+        "6": {
+          "pos": 6,
+          "label": "(-x,-y)",
+          "dx_mean": -0.4225387166423843,
+          "dx_std": 0.015437808922885692,
+          "dy_mean": -0.07747781968125764,
+          "dy_std": 0.0293952101232682
+        },
+        "7": {
+          "pos": 7,
+          "label": "(0,-y)",
+          "dx_mean": -0.0037437137176311807,
+          "dx_std": 0.015112565192195525,
+          "dy_mean": -0.004458789849945788,
+          "dy_std": 0.010138083319796716
+        },
+        "8": {
+          "pos": 8,
+          "label": "(+x,-y)",
+          "dx_mean": 0.3474050682661982,
+          "dx_std": 0.010647766292106129,
+          "dy_mean": -0.12477438859200447,
+          "dy_std": 0.015182237585910394
+        }
+      }
+    },
+    "0.14000": {
+      "tilt_angle": 0.13999999999999999,
+      "sweep_axis": "x",
+      "mean_shifts": {
+        "0": {
+          "pos": 0,
+          "label": "(-x,+y)",
+          "dx_mean": -0.48394096058941616,
+          "dx_std": 0.06881902520646445,
+          "dy_mean": -0.11473678002882934,
+          "dy_std": 0.03487739406237209
+        },
+        "1": {
+          "pos": 1,
+          "label": "(0,+y)",
+          "dx_mean": -0.022781228771600583,
+          "dx_std": 0.06415837137226278,
+          "dy_mean": -0.007474831497324886,
+          "dy_std": 0.0260428333280777
+        },
+        "2": {
+          "pos": 2,
+          "label": "(+x,+y)",
+          "dx_mean": 0.40303410752053426,
+          "dx_std": 0.06139636827843462,
+          "dy_mean": -0.1378180413830023,
+          "dy_std": 0.02920290025020894
+        },
+        "3": {
+          "pos": 3,
+          "label": "(-x, 0)",
+          "dx_mean": -0.4652767901270181,
+          "dx_std": 0.02419951032609992,
+          "dy_mean": -0.12299117005902645,
+          "dy_std": 0.045916104866223884
+        },
+        "5": {
+          "pos": 5,
+          "label": "(+x, 0)",
+          "dx_mean": 0.4262368117453207,
+          "dx_std": 0.026511046106518738,
+          "dy_mean": -0.11691864332849491,
+          "dy_std": 0.03916768266266381
+        },
+        "6": {
+          "pos": 6,
+          "label": "(-x,-y)",
+          "dx_mean": -0.47526075366822623,
+          "dx_std": 0.036768202428882006,
+          "dy_mean": -0.10712475625671232,
+          "dy_std": 0.05830499527794744
+        },
+        "7": {
+          "pos": 7,
+          "label": "(0,-y)",
+          "dx_mean": -0.004403128998137618,
+          "dx_std": 0.03437499550863473,
+          "dy_mean": -0.02453681293607133,
+          "dy_std": 0.03862518670170673
+        },
+        "8": {
+          "pos": 8,
+          "label": "(+x,-y)",
+          "dx_mean": 0.4221478654835664,
+          "dx_std": 0.043725243573605764,
+          "dy_mean": -0.13022775404449477,
+          "dy_std": 0.043215896928973
+        }
+      }
+    },
+    "0.16000": {
+      "tilt_angle": 0.15999999999999998,
+      "sweep_axis": "x",
+      "mean_shifts": {
+        "0": {
+          "pos": 0,
+          "label": "(-x,+y)",
+          "dx_mean": -0.5297526621067391,
+          "dx_std": 0.007558592293669749,
+          "dy_mean": -0.10352408121691496,
+          "dy_std": 0.016181164358852196
+        },
+        "1": {
+          "pos": 1,
+          "label": "(0,+y)",
+          "dx_mean": -0.011502033537044553,
+          "dx_std": 0.004432627051146603,
+          "dy_mean": -0.006203988348647727,
+          "dy_std": 0.014093446044207902
+        },
+        "2": {
+          "pos": 2,
+          "label": "(+x,+y)",
+          "dx_mean": 0.5041861021985824,
+          "dx_std": 0.011044502172035488,
+          "dy_mean": -0.1389832640936902,
+          "dy_std": 0.017014943896296493
+        },
+        "3": {
+          "pos": 3,
+          "label": "(-x, 0)",
+          "dx_mean": -0.5237935866072349,
+          "dx_std": 0.013218197259942503,
+          "dy_mean": -0.09964940869556357,
+          "dy_std": 0.01769216334441092
+        },
+        "5": {
+          "pos": 5,
+          "label": "(+x, 0)",
+          "dx_mean": 0.5007538337230016,
+          "dx_std": 0.010532834986562191,
+          "dy_mean": -0.12666304932954517,
+          "dy_std": 0.022276170346279173
+        },
+        "6": {
+          "pos": 6,
+          "label": "(-x,-y)",
+          "dx_mean": -0.5268575341436644,
+          "dx_std": 0.011376388251436675,
+          "dy_mean": -0.10692695613852266,
+          "dy_std": 0.022570450815837258
+        },
+        "7": {
+          "pos": 7,
+          "label": "(0,-y)",
+          "dx_mean": -0.002809120599204107,
+          "dx_std": 0.0060029642093053365,
+          "dy_mean": -0.0062448413031916065,
+          "dy_std": 0.017599555225226438
+        },
+        "8": {
+          "pos": 8,
+          "label": "(+x,-y)",
+          "dx_mean": 0.5014711991942932,
+          "dx_std": 0.009353450254032092,
+          "dy_mean": -0.13552907445027812,
+          "dy_std": 0.02667857904526657
+        }
+      }
+    },
+    "0.18000": {
+      "tilt_angle": 0.17999999999999997,
+      "sweep_axis": "x",
+      "mean_shifts": {
+        "0": {
+          "pos": 0,
+          "label": "(-x,+y)",
+          "dx_mean": -0.6062206041701756,
+          "dx_std": 0.015274973515535336,
+          "dy_mean": -0.04367736669594251,
+          "dy_std": 0.015570875057847114
+        },
+        "1": {
+          "pos": 1,
+          "label": "(0,+y)",
+          "dx_mean": 0.01545108266996067,
+          "dx_std": 0.028302549536411155,
+          "dy_mean": 0.0060801228053151135,
+          "dy_std": 0.007722116781091937
+        },
+        "2": {
+          "pos": 2,
+          "label": "(+x,+y)",
+          "dx_mean": 0.5853196853511691,
+          "dx_std": 0.04592652377078053,
+          "dy_mean": -0.09750736676189717,
+          "dy_std": 0.03040829700544563
+        },
+        "3": {
+          "pos": 3,
+          "label": "(-x, 0)",
+          "dx_mean": -0.5984972547265442,
+          "dx_std": 0.02000401868114217,
+          "dy_mean": -0.04352973563368323,
+          "dy_std": 0.006415394467041248
+        },
+        "5": {
+          "pos": 5,
+          "label": "(+x, 0)",
+          "dx_mean": 0.5592452951609175,
+          "dx_std": 0.01125987389531087,
+          "dy_mean": -0.09801380030612564,
+          "dy_std": 0.018747089808616006
+        },
+        "6": {
+          "pos": 6,
+          "label": "(-x,-y)",
+          "dx_mean": -0.609046910598454,
+          "dx_std": 0.008755150413914425,
+          "dy_mean": -0.04217669680117524,
+          "dy_std": 0.015658441197842668
+        },
+        "7": {
+          "pos": 7,
+          "label": "(0,-y)",
+          "dx_mean": -0.009354272702512389,
+          "dx_std": 0.012133220559278513,
+          "dy_mean": 0.011426968418527394,
+          "dy_std": 0.014030933358930128
+        },
+        "8": {
+          "pos": 8,
+          "label": "(+x,-y)",
+          "dx_mean": 0.5531849792830599,
+          "dx_std": 0.0043093732240868515,
+          "dy_mean": -0.09167654747907364,
+          "dy_std": 0.019908376610766533
+        }
+      }
+    },
+    "0.20000": {
+      "tilt_angle": 0.19999999999999996,
+      "sweep_axis": "x",
+      "mean_shifts": {
+        "0": {
+          "pos": 0,
+          "label": "(-x,+y)",
+          "dx_mean": -0.8159780098703322,
+          "dx_std": 0.35821306629987965,
+          "dy_mean": 0.03401337897030317,
+          "dy_std": 0.11325836831078817
+        },
+        "1": {
+          "pos": 1,
+          "label": "(0,+y)",
+          "dx_mean": -0.08183311451170994,
+          "dx_std": 0.16840046545172532,
+          "dy_mean": -0.00027706053288056864,
+          "dy_std": 0.0397161171119263
+        },
+        "2": {
+          "pos": 2,
+          "label": "(+x,+y)",
+          "dx_mean": 0.6431390178223865,
+          "dx_std": 0.02790818465745114,
+          "dy_mean": -0.07107978831645596,
+          "dy_std": 0.06790487366524875
+        },
+        "3": {
+          "pos": 3,
+          "label": "(-x, 0)",
+          "dx_mean": -0.621437843538024,
+          "dx_std": 0.0508578484819709,
+          "dy_mean": -0.0236773111317234,
+          "dy_std": 0.05144698980882576
+        },
+        "5": {
+          "pos": 5,
+          "label": "(+x, 0)",
+          "dx_mean": 0.6520860599279331,
+          "dx_std": 0.04475061859853784,
+          "dy_mean": -0.06492330716546349,
+          "dy_std": 0.067825594382031
+        },
+        "6": {
+          "pos": 6,
+          "label": "(-x,-y)",
+          "dx_mean": -0.6157654611088219,
+          "dx_std": 0.07727305389232286,
+          "dy_mean": -0.02056176326864261,
+          "dy_std": 0.06887336125209789
+        },
+        "7": {
+          "pos": 7,
+          "label": "(0,-y)",
+          "dx_mean": 0.004849383886084979,
+          "dx_std": 0.024111608301504644,
+          "dy_mean": -0.011554853867801284,
+          "dy_std": 0.01921803378807719
+        },
+        "8": {
+          "pos": 8,
+          "label": "(+x,-y)",
+          "dx_mean": 0.6636587092637001,
+          "dx_std": 0.05106127438447629,
+          "dy_mean": -0.07119641684969338,
+          "dy_std": 0.06899275574115799
+        }
+      }
+    },
+    "0.22000": {
+      "tilt_angle": 0.21999999999999995,
+      "sweep_axis": "x",
+      "mean_shifts": {
+        "0": {
+          "pos": 0,
+          "label": "(-x,+y)",
+          "dx_mean": -0.598089488798496,
+          "dx_std": 0.006471463540263742,
+          "dy_mean": 0.0428921801285469,
+          "dy_std": 0.01279140019344266
+        },
+        "1": {
+          "pos": 1,
+          "label": "(0,+y)",
+          "dx_mean": 0.0010252237613713078,
+          "dx_std": 0.008472374449836274,
+          "dy_mean": 0.0071334571351826526,
+          "dy_std": 0.013730267391344414
+        },
+        "2": {
+          "pos": 2,
+          "label": "(+x,+y)",
+          "dx_mean": 0.747991785570548,
+          "dx_std": 0.009119607376123978,
+          "dy_mean": 0.02637080420577149,
+          "dy_std": 0.010888495582370396
+        },
+        "3": {
+          "pos": 3,
+          "label": "(-x, 0)",
+          "dx_mean": -0.5986783630968148,
+          "dx_std": 0.004151698860911238,
+          "dy_mean": 0.03960778325056254,
+          "dy_std": 0.013248777627212613
+        },
+        "5": {
+          "pos": 5,
+          "label": "(+x, 0)",
+          "dx_mean": 0.7502032540131495,
+          "dx_std": 0.004124538348437493,
+          "dy_mean": 0.025834967420519207,
+          "dy_std": 0.01068542383757387
+        },
+        "6": {
+          "pos": 6,
+          "label": "(-x,-y)",
+          "dx_mean": -0.6007902433556864,
+          "dx_std": 0.0039915506884172555,
+          "dy_mean": 0.04284737322657293,
+          "dy_std": 0.008564756581804377
+        },
+        "7": {
+          "pos": 7,
+          "label": "(0,-y)",
+          "dx_mean": 0.0020171030180335947,
+          "dx_std": 0.008696905567887823,
+          "dy_mean": 0.010829382483120754,
+          "dy_std": 0.014523303982088724
+        },
+        "8": {
+          "pos": 8,
+          "label": "(+x,-y)",
+          "dx_mean": 0.7526296037391148,
+          "dx_std": 0.008262801805052412,
+          "dy_mean": 0.02588788512186966,
+          "dy_std": 0.011002891088045655
+        }
+      }
+    },
+    "0.24000": {
+      "tilt_angle": 0.23999999999999996,
+      "sweep_axis": "x",
+      "mean_shifts": {
+        "0": {
+          "pos": 0,
+          "label": "(-x,+y)",
+          "dx_mean": -0.675523820988019,
+          "dx_std": 0.011213600366925989,
+          "dy_mean": 0.030966060767536874,
+          "dy_std": 0.008022392794593384
+        },
+        "1": {
+          "pos": 1,
+          "label": "(0,+y)",
+          "dx_mean": 0.00623656431175732,
+          "dx_std": 0.005135648768642584,
+          "dy_mean": -0.006577366690862618,
+          "dy_std": 0.007378277230341274
+        },
+        "2": {
+          "pos": 2,
+          "label": "(+x,+y)",
+          "dx_mean": 0.8189802956978838,
+          "dx_std": 0.005820333495443291,
+          "dy_mean": -0.0005059233596739432,
+          "dy_std": 0.008452628061453821
+        },
+        "3": {
+          "pos": 3,
+          "label": "(-x, 0)",
+          "dx_mean": -0.6787458576831341,
+          "dx_std": 0.013517365723627717,
+          "dy_mean": 0.04117252188657403,
+          "dy_std": 0.004433719150710309
+        },
+        "5": {
+          "pos": 5,
+          "label": "(+x, 0)",
+          "dx_mean": 0.8140949884621932,
+          "dx_std": 0.010319539072464252,
+          "dy_mean": -7.927046451641217e-05,
+          "dy_std": 0.008761601872171608
+        },
+        "6": {
+          "pos": 6,
+          "label": "(-x,-y)",
+          "dx_mean": -0.6832798696981627,
+          "dx_std": 0.010424297577506604,
+          "dy_mean": 0.042405048057253224,
+          "dy_std": 0.006692353568302994
+        },
+        "7": {
+          "pos": 7,
+          "label": "(0,-y)",
+          "dx_mean": -0.0026583319536712226,
+          "dx_std": 0.0040124452804498984,
+          "dy_mean": -0.0004137520311132903,
+          "dy_std": 0.007005065247159817
+        },
+        "8": {
+          "pos": 8,
+          "label": "(+x,-y)",
+          "dx_mean": 0.8100038222606599,
+          "dx_std": 0.00435477711113808,
+          "dy_mean": 0.0007115317100442553,
+          "dy_std": 0.008321813460375293
+        }
+      }
+    },
+    "0.26000": {
+      "tilt_angle": 0.25999999999999995,
+      "sweep_axis": "x",
+      "mean_shifts": {
+        "0": {
+          "pos": 0,
+          "label": "(-x,+y)",
+          "dx_mean": -0.8232030911462971,
+          "dx_std": 0.013832611504869984,
+          "dy_mean": 0.07013242490343145,
+          "dy_std": 0.009136359578271995
+        },
+        "1": {
+          "pos": 1,
+          "label": "(0,+y)",
+          "dx_mean": 0.01025201655552337,
+          "dx_std": 0.007349304383358031,
+          "dy_mean": -0.004222551322732216,
+          "dy_std": 0.002886384412360096
+        },
+        "2": {
+          "pos": 2,
+          "label": "(+x,+y)",
+          "dx_mean": 0.8779820046017448,
+          "dx_std": 0.0055472094123343715,
+          "dy_mean": -0.0281283760070437,
+          "dy_std": 0.006605889078844605
+        },
+        "3": {
+          "pos": 3,
+          "label": "(-x, 0)",
+          "dx_mean": -0.8321709286626628,
+          "dx_std": 0.013252105137464248,
+          "dy_mean": 0.06960925915641383,
+          "dy_std": 0.01306241229614812
+        },
+        "5": {
+          "pos": 5,
+          "label": "(+x, 0)",
+          "dx_mean": 0.8666832976965907,
+          "dx_std": 0.0032457646063807147,
+          "dy_mean": -0.028459659731515784,
+          "dy_std": 0.007580970546447723
+        },
+        "6": {
+          "pos": 6,
+          "label": "(-x,-y)",
+          "dx_mean": -0.8392273500320243,
+          "dx_std": 0.006578921564318395,
+          "dy_mean": 0.07718314840442417,
+          "dy_std": 0.00897574367981552
+        },
+        "7": {
+          "pos": 7,
+          "label": "(0,-y)",
+          "dx_mean": -0.0034689296965552787,
+          "dx_std": 0.0040228784876282075,
+          "dy_mean": 0.0013747986239195597,
+          "dy_std": 0.003689537673209063
+        },
+        "8": {
+          "pos": 8,
+          "label": "(+x,-y)",
+          "dx_mean": 0.8619766304715085,
+          "dx_std": 0.006632503782697893,
+          "dy_mean": -0.027312641320031618,
+          "dy_std": 0.007511733425698374
+        }
+      }
+    },
+    "0.28000": {
+      "tilt_angle": 0.27999999999999997,
+      "sweep_axis": "x",
+      "mean_shifts": {
+        "0": {
+          "pos": 0,
+          "label": "(-x,+y)",
+          "dx_mean": -0.8842697184654298,
+          "dx_std": 0.009287574945979059,
+          "dy_mean": 0.05585721488116633,
+          "dy_std": 0.0042562522655671
+        },
+        "1": {
+          "pos": 1,
+          "label": "(0,+y)",
+          "dx_mean": 0.005301773953351585,
+          "dx_std": 0.003825724825844367,
+          "dy_mean": -0.00246706660025211,
+          "dy_std": 0.013008840871229617
+        },
+        "2": {
+          "pos": 2,
+          "label": "(+x,+y)",
+          "dx_mean": 0.925411945641963,
+          "dx_std": 0.005269222770804118,
+          "dy_mean": -0.03818353759577349,
+          "dy_std": 0.009328288573583372
+        },
+        "3": {
+          "pos": 3,
+          "label": "(-x, 0)",
+          "dx_mean": -0.896657834437201,
+          "dx_std": 0.008483445892699351,
+          "dy_mean": 0.05136973138933172,
+          "dy_std": 0.0077662042131327845
+        },
+        "5": {
+          "pos": 5,
+          "label": "(+x, 0)",
+          "dx_mean": 0.9211074276161071,
+          "dx_std": 0.004575968765640282,
+          "dy_mean": -0.036310718303388965,
+          "dy_std": 0.004994847122931353
+        },
+        "6": {
+          "pos": 6,
+          "label": "(-x,-y)",
+          "dx_mean": -0.8992746948306831,
+          "dx_std": 0.003931059957807967,
+          "dy_mean": 0.05700043889066819,
+          "dy_std": 0.006933146974661742
+        },
+        "7": {
+          "pos": 7,
+          "label": "(0,-y)",
+          "dx_mean": -0.007758837456276524,
+          "dx_std": 0.0044106296670809505,
+          "dy_mean": 0.002327100229081225,
+          "dy_std": 0.009284379546322979
+        },
+        "8": {
+          "pos": 8,
+          "label": "(+x,-y)",
+          "dx_mean": 0.9138083086764709,
+          "dx_std": 0.00788638979901401,
+          "dy_mean": -0.027696407105486286,
+          "dy_std": 0.007101341381192351
+        }
+      }
+    },
+    "0.30000": {
+      "tilt_angle": 0.3,
+      "sweep_axis": "x",
+      "mean_shifts": {
+        "0": {
+          "pos": 0,
+          "label": "(-x,+y)",
+          "dx_mean": -0.8869128988121247,
+          "dx_std": 0.16940647448684676,
+          "dy_mean": -0.03416178347838468,
+          "dy_std": 0.060508902456078255
+        },
+        "1": {
+          "pos": 1,
+          "label": "(0,+y)",
+          "dx_mean": 0.07777817160963423,
+          "dx_std": 0.16022971740306596,
+          "dy_mean": -0.061288753623261985,
+          "dy_std": 0.06898110486861632
+        },
+        "2": {
+          "pos": 2,
+          "label": "(+x,+y)",
+          "dx_mean": 1.0649217899452652,
+          "dx_std": 0.12279845470856766,
+          "dy_mean": -0.05264240160413465,
+          "dy_std": 0.048400356372812904
+        },
+        "3": {
+          "pos": 3,
+          "label": "(-x, 0)",
+          "dx_mean": -0.9310390334264866,
+          "dx_std": 0.061372222785327425,
+          "dy_mean": 0.002742158790101712,
+          "dy_std": 0.04114367331328053
+        },
+        "5": {
+          "pos": 5,
+          "label": "(+x, 0)",
+          "dx_mean": 0.912979558668303,
+          "dx_std": 0.14084469296242533,
+          "dy_mean": -0.021921683895243405,
+          "dy_std": 0.026510951113702223
+        },
+        "6": {
+          "pos": 6,
+          "label": "(-x,-y)",
+          "dx_mean": -1.0409745851678054,
+          "dx_std": 0.1219522917433396,
+          "dy_mean": 0.06153634172092097,
+          "dy_std": 0.050750385519440326
+        },
+        "7": {
+          "pos": 7,
+          "label": "(0,-y)",
+          "dx_mean": -0.09372697394569514,
+          "dx_std": 0.14964136509735407,
+          "dy_mean": 0.026376901866228764,
+          "dy_std": 0.04622563518074608
+        },
+        "8": {
+          "pos": 8,
+          "label": "(+x,-y)",
+          "dx_mean": 0.9483293747755397,
+          "dx_std": 0.03451527467670508,
+          "dy_mean": -0.009607998116507588,
+          "dy_std": 0.034328112908379546
+        }
+      }
+    }
+  },
+  "y_sweep": {
+    "0.02000": {
+      "tilt_angle": 0.02,
+      "sweep_axis": "y",
+      "mean_shifts": {
+        "0": {
+          "pos": 0,
+          "label": "(-x,+y)",
+          "dx_mean": -0.03947874848531683,
+          "dx_std": 0.05894528727466312,
+          "dy_mean": 0.09236458735520045,
+          "dy_std": 0.028242076053665733
+        },
+        "1": {
+          "pos": 1,
+          "label": "(0,+y)",
+          "dx_mean": -0.016374491095348276,
+          "dx_std": 0.014303408484260073,
+          "dy_mean": 0.0790348007649527,
+          "dy_std": 0.012214375657782309
+        },
+        "2": {
+          "pos": 2,
+          "label": "(+x,+y)",
+          "dx_mean": -0.010828919029154348,
+          "dx_std": 0.013337055609323665,
+          "dy_mean": 0.08076986000521628,
+          "dy_std": 0.008329708467204995
+        },
+        "3": {
+          "pos": 3,
+          "label": "(-x, 0)",
+          "dx_mean": 0.004913812062704892,
+          "dx_std": 0.006150335605030541,
+          "dy_mean": 0.005603098121673611,
+          "dy_std": 0.0070546484570440165
+        },
+        "5": {
+          "pos": 5,
+          "label": "(+x, 0)",
+          "dx_mean": 0.007646703388991228,
+          "dx_std": 0.00951664133962694,
+          "dy_mean": -0.0040915228439871495,
+          "dy_std": 0.019083775375309264
+        },
+        "6": {
+          "pos": 6,
+          "label": "(-x,-y)",
+          "dx_mean": 0.015084704563059858,
+          "dx_std": 0.01661598533714314,
+          "dy_mean": -0.07786132095600351,
+          "dy_std": 0.010220433352649808
+        },
+        "7": {
+          "pos": 7,
+          "label": "(0,-y)",
+          "dx_mean": -0.007051842387363649,
+          "dx_std": 0.060725927683781294,
+          "dy_mean": -0.06520587087568401,
+          "dy_std": 0.022267021649761368
+        },
+        "8": {
+          "pos": 8,
+          "label": "(+x,-y)",
+          "dx_mean": -0.022740834025762525,
+          "dx_std": 0.1442352689963699,
+          "dy_mean": -0.05329388848074359,
+          "dy_std": 0.04793763555566377
+        }
+      }
+    },
+    "0.04000": {
+      "tilt_angle": 0.039999999999999994,
+      "sweep_axis": "y",
+      "mean_shifts": {
+        "0": {
+          "pos": 0,
+          "label": "(-x,+y)",
+          "dx_mean": -0.010367078199260504,
+          "dx_std": 0.08977943763371427,
+          "dy_mean": 0.09151162904788634,
+          "dy_std": 0.08205424196263143
+        },
+        "1": {
+          "pos": 1,
+          "label": "(0,+y)",
+          "dx_mean": -0.03267431571075576,
+          "dx_std": 0.06899855507292987,
+          "dy_mean": 0.1257477415206722,
+          "dy_std": 0.05840597883180327
+        },
+        "2": {
+          "pos": 2,
+          "label": "(+x,+y)",
+          "dx_mean": -0.03631915452415342,
+          "dx_std": 0.06620120215480306,
+          "dy_mean": 0.13537563028430669,
+          "dy_std": 0.027954451365288988
+        },
+        "3": {
+          "pos": 3,
+          "label": "(-x, 0)",
+          "dx_mean": -0.0016800198940927658,
+          "dx_std": 0.004547905789292882,
+          "dy_mean": 0.02144101454853171,
+          "dy_std": 0.021583367502258064
+        },
+        "5": {
+          "pos": 5,
+          "label": "(+x, 0)",
+          "dx_mean": -0.007562149208615665,
+          "dx_std": 0.04213517812916869,
+          "dy_mean": -0.0018706818144664794,
+          "dy_std": 0.024017953996861168
+        },
+        "6": {
+          "pos": 6,
+          "label": "(-x,-y)",
+          "dx_mean": 0.014713655389823544,
+          "dx_std": 0.00898906748210045,
+          "dy_mean": -0.12607885743211683,
+          "dy_std": 0.040010632868171504
+        },
+        "7": {
+          "pos": 7,
+          "label": "(0,-y)",
+          "dx_mean": 0.02295565743525003,
+          "dx_std": 0.02691928081876258,
+          "dy_mean": -0.13113322739047817,
+          "dy_std": 0.05876818380885144
+        },
+        "8": {
+          "pos": 8,
+          "label": "(+x,-y)",
+          "dx_mean": 0.028411813825414356,
+          "dx_std": 0.027048658009568738,
+          "dy_mean": -0.11530189479608452,
+          "dy_std": 0.03352666469750817
+        }
+      }
+    },
+    "0.06000": {
+      "tilt_angle": 0.06,
+      "sweep_axis": "y",
+      "mean_shifts": {
+        "0": {
+          "pos": 0,
+          "label": "(-x,+y)",
+          "dx_mean": -0.03590624903208663,
+          "dx_std": 0.07311891690710418,
+          "dy_mean": 0.18777105335232136,
+          "dy_std": 0.018540427504557193
+        },
+        "1": {
+          "pos": 1,
+          "label": "(0,+y)",
+          "dx_mean": -0.03629087481685929,
+          "dx_std": 0.08980525003470094,
+          "dy_mean": 0.20474288508105473,
+          "dy_std": 0.0442595364964881
+        },
+        "2": {
+          "pos": 2,
+          "label": "(+x,+y)",
+          "dx_mean": -0.0007672572585306625,
+          "dx_std": 0.05676950427498704,
+          "dy_mean": 0.17629345722423295,
+          "dy_std": 0.024548249231464283
+        },
+        "3": {
+          "pos": 3,
+          "label": "(-x, 0)",
+          "dx_mean": 0.0018402445414722024,
+          "dx_std": 0.01084482404869724,
+          "dy_mean": -0.005260778854812997,
+          "dy_std": 0.03076764927138434
+        },
+        "5": {
+          "pos": 5,
+          "label": "(+x, 0)",
+          "dx_mean": -0.020369696107263736,
+          "dx_std": 0.046179656514415975,
+          "dy_mean": 0.018573582697513302,
+          "dy_std": 0.06202495109425706
+        },
+        "6": {
+          "pos": 6,
+          "label": "(-x,-y)",
+          "dx_mean": 0.04189638268530871,
+          "dx_std": 0.06632965093100897,
+          "dy_mean": -0.17512750552691614,
+          "dy_std": 0.036255146729566146
+        },
+        "7": {
+          "pos": 7,
+          "label": "(0,-y)",
+          "dx_mean": 0.0723852248350795,
+          "dx_std": 0.018491143853603807,
+          "dy_mean": -0.2188699514273594,
+          "dy_std": 0.02747540785905846
+        },
+        "8": {
+          "pos": 8,
+          "label": "(+x,-y)",
+          "dx_mean": 0.04619237347278613,
+          "dx_std": 0.0720336719620683,
+          "dy_mean": -0.19125499796930398,
+          "dy_std": 0.046030251273834394
+        }
+      }
+    },
+    "0.08000": {
+      "tilt_angle": 0.07999999999999999,
+      "sweep_axis": "y",
+      "mean_shifts": {
+        "0": {
+          "pos": 0,
+          "label": "(-x,+y)",
+          "dx_mean": 0.0018071616909764998,
+          "dx_std": 0.06870138936055789,
+          "dy_mean": 0.2962232651086197,
+          "dy_std": 0.05198241168526987
+        },
+        "1": {
+          "pos": 1,
+          "label": "(0,+y)",
+          "dx_mean": -0.021757866246025513,
+          "dx_std": 0.05683452981903185,
+          "dy_mean": 0.2620500320947713,
+          "dy_std": 0.047736387986782404
+        },
+        "2": {
+          "pos": 2,
+          "label": "(+x,+y)",
+          "dx_mean": -0.01984287383897936,
+          "dx_std": 0.05581490033446936,
+          "dy_mean": 0.2910290145722684,
+          "dy_std": 0.046911767586481495
+        },
+        "3": {
+          "pos": 3,
+          "label": "(-x, 0)",
+          "dx_mean": -0.0008652508104205481,
+          "dx_std": 0.028688693783055556,
+          "dy_mean": 0.02734143922241401,
+          "dy_std": 0.02175255245179326
+        },
+        "5": {
+          "pos": 5,
+          "label": "(+x, 0)",
+          "dx_mean": -0.024870867265417474,
+          "dx_std": 0.019051918294017502,
+          "dy_mean": 0.016119404422738626,
+          "dy_std": 0.02375774492754356
+        },
+        "6": {
+          "pos": 6,
+          "label": "(-x,-y)",
+          "dx_mean": 0.04210324019240943,
+          "dx_std": 0.027355388275281473,
+          "dy_mean": -0.22111524567874313,
+          "dy_std": 0.0322880595654206
+        },
+        "7": {
+          "pos": 7,
+          "label": "(0,-y)",
+          "dx_mean": 0.046546026785426874,
+          "dx_std": 0.02957813821704825,
+          "dy_mean": -0.240364016047306,
+          "dy_std": 0.038683581806171874
+        },
+        "8": {
+          "pos": 8,
+          "label": "(+x,-y)",
+          "dx_mean": 0.048435744906191756,
+          "dx_std": 0.025353027641975886,
+          "dy_mean": -0.23060314498341086,
+          "dy_std": 0.033680767650677595
+        }
+      }
+    },
+    "0.10000": {
+      "tilt_angle": 0.09999999999999999,
+      "sweep_axis": "y",
+      "mean_shifts": {
+        "0": {
+          "pos": 0,
+          "label": "(-x,+y)",
+          "dx_mean": -0.014242687952037158,
+          "dx_std": 0.025726239261505433,
+          "dy_mean": 0.32735212110119394,
+          "dy_std": 0.03450194177350285
+        },
+        "1": {
+          "pos": 1,
+          "label": "(0,+y)",
+          "dx_mean": -0.021161671105573987,
+          "dx_std": 0.020043819366329967,
+          "dy_mean": 0.3255815196726644,
+          "dy_std": 0.02651313368623939
+        },
+        "2": {
+          "pos": 2,
+          "label": "(+x,+y)",
+          "dx_mean": -0.017249689507934818,
+          "dx_std": 0.014183062528312671,
+          "dy_mean": 0.3173021346102587,
+          "dy_std": 0.02238646261692838
+        },
+        "3": {
+          "pos": 3,
+          "label": "(-x, 0)",
+          "dx_mean": 0.0015049724348045856,
+          "dx_std": 0.013891126467892043,
+          "dy_mean": -0.009591706424953373,
+          "dy_std": 0.02712978274424977
+        },
+        "5": {
+          "pos": 5,
+          "label": "(+x, 0)",
+          "dx_mean": -0.0007415191925701948,
+          "dx_std": 0.011993306492830133,
+          "dy_mean": -0.014145501987854914,
+          "dy_std": 0.023801585059846836
+        },
+        "6": {
+          "pos": 6,
+          "label": "(-x,-y)",
+          "dx_mean": 0.060870170784710353,
+          "dx_std": 0.01732980745034766,
+          "dy_mean": -0.39449013724663473,
+          "dy_std": 0.032735891666911446
+        },
+        "7": {
+          "pos": 7,
+          "label": "(0,-y)",
+          "dx_mean": 0.06469087391519679,
+          "dx_std": 0.017619805657315666,
+          "dy_mean": -0.3883274055230004,
+          "dy_std": 0.029090488557619677
+        },
+        "8": {
+          "pos": 8,
+          "label": "(+x,-y)",
+          "dx_mean": 0.06703686026689866,
+          "dx_std": 0.01793712325050745,
+          "dy_mean": -0.36673598733680135,
+          "dy_std": 0.01920554420940356
+        }
+      }
+    },
+    "0.12000": {
+      "tilt_angle": 0.11999999999999998,
+      "sweep_axis": "y",
+      "mean_shifts": {
+        "0": {
+          "pos": 0,
+          "label": "(-x,+y)",
+          "dx_mean": -0.03891379741726268,
+          "dx_std": 0.01577101580877872,
+          "dy_mean": 0.39757899645990163,
+          "dy_std": 0.04055319238105234
+        },
+        "1": {
+          "pos": 1,
+          "label": "(0,+y)",
+          "dx_mean": -0.025846466283337578,
+          "dx_std": 0.01374724260654684,
+          "dy_mean": 0.41420010432500476,
+          "dy_std": 0.02148277532488749
+        },
+        "2": {
+          "pos": 2,
+          "label": "(+x,+y)",
+          "dx_mean": -0.017035785464395305,
+          "dx_std": 0.01332178041008351,
+          "dy_mean": 0.41657760207785943,
+          "dy_std": 0.035087033282369874
+        },
+        "3": {
+          "pos": 3,
+          "label": "(-x, 0)",
+          "dx_mean": -0.0007224073359793692,
+          "dx_std": 0.008427346934292743,
+          "dy_mean": -0.009999481412728528,
+          "dy_std": 0.009015830318527516
+        },
+        "5": {
+          "pos": 5,
+          "label": "(+x, 0)",
+          "dx_mean": 0.003356970729191744,
+          "dx_std": 0.008369130887127936,
+          "dy_mean": -0.014244268400420878,
+          "dy_std": 0.033560810484799204
+        },
+        "6": {
+          "pos": 6,
+          "label": "(-x,-y)",
+          "dx_mean": 0.019962049774767364,
+          "dx_std": 0.013696686941677272,
+          "dy_mean": -0.41112163040231736,
+          "dy_std": 0.03876005949178177
+        },
+        "7": {
+          "pos": 7,
+          "label": "(0,-y)",
+          "dx_mean": 0.012176657328927832,
+          "dx_std": 0.016225815804719053,
+          "dy_mean": -0.42408347244702327,
+          "dy_std": 0.01770307621967999
+        },
+        "8": {
+          "pos": 8,
+          "label": "(+x,-y)",
+          "dx_mean": 0.014030134611266476,
+          "dx_std": 0.010844572973446714,
+          "dy_mean": -0.4354994523275536,
+          "dy_std": 0.03166000378605656
+        }
+      }
+    },
+    "0.14000": {
+      "tilt_angle": 0.13999999999999999,
+      "sweep_axis": "y",
+      "mean_shifts": {
+        "0": {
+          "pos": 0,
+          "label": "(-x,+y)",
+          "dx_mean": -0.019442847066056857,
+          "dx_std": 0.033555259110912644,
+          "dy_mean": 0.4917831217807816,
+          "dy_std": 0.03160342679055161
+        },
+        "1": {
+          "pos": 1,
+          "label": "(0,+y)",
+          "dx_mean": -0.011734247009962928,
+          "dx_std": 0.033463560474544275,
+          "dy_mean": 0.5104141852975544,
+          "dy_std": 0.03130776732447505
+        },
+        "2": {
+          "pos": 2,
+          "label": "(+x,+y)",
+          "dx_mean": -0.008316674496882115,
+          "dx_std": 0.028837175532204284,
+          "dy_mean": 0.4911581172992328,
+          "dy_std": 0.008957722360160772
+        },
+        "3": {
+          "pos": 3,
+          "label": "(-x, 0)",
+          "dx_mean": 0.018235020363772492,
+          "dx_std": 0.018914001238215464,
+          "dy_mean": -0.020612734669111888,
+          "dy_std": 0.015407436690918146
+        },
+        "5": {
+          "pos": 5,
+          "label": "(+x, 0)",
+          "dx_mean": 0.006454565864669348,
+          "dx_std": 0.011912824746335987,
+          "dy_mean": -0.013541429509041336,
+          "dy_std": 0.017522364890289722
+        },
+        "6": {
+          "pos": 6,
+          "label": "(-x,-y)",
+          "dx_mean": -0.021931240443882415,
+          "dx_std": 0.014490361239728662,
+          "dy_mean": -0.46366028634831763,
+          "dy_std": 0.02397626835066007
+        },
+        "7": {
+          "pos": 7,
+          "label": "(0,-y)",
+          "dx_mean": -0.03759526619728604,
+          "dx_std": 0.016728109437963375,
+          "dy_mean": -0.4743818799699966,
+          "dy_std": 0.025410871150794333
+        },
+        "8": {
+          "pos": 8,
+          "label": "(+x,-y)",
+          "dx_mean": -0.027546036650755924,
+          "dx_std": 0.019091992971333127,
+          "dy_mean": -0.4760809270409709,
+          "dy_std": 0.02444802204846501
+        }
+      }
+    },
+    "0.16000": {
+      "tilt_angle": 0.15999999999999998,
+      "sweep_axis": "y",
+      "mean_shifts": {
+        "0": {
+          "pos": 0,
+          "label": "(-x,+y)",
+          "dx_mean": 0.0035181541895326516,
+          "dx_std": 0.02952649966229028,
+          "dy_mean": 0.5653546012462357,
+          "dy_std": 0.043763957854347085
+        },
+        "1": {
+          "pos": 1,
+          "label": "(0,+y)",
+          "dx_mean": 0.003769183588474334,
+          "dx_std": 0.02450052855980087,
+          "dy_mean": 0.5802350130971717,
+          "dy_std": 0.02451710513777747
+        },
+        "2": {
+          "pos": 2,
+          "label": "(+x,+y)",
+          "dx_mean": 0.005298559455377471,
+          "dx_std": 0.015681108027990824,
+          "dy_mean": 0.573315803346145,
+          "dy_std": 0.02922234614472081
+        },
+        "3": {
+          "pos": 3,
+          "label": "(-x, 0)",
+          "dx_mean": 0.005064720593554739,
+          "dx_std": 0.02243880305177201,
+          "dy_mean": 0.0058217020458414485,
+          "dy_std": 0.03564363597880204
+        },
+        "5": {
+          "pos": 5,
+          "label": "(+x, 0)",
+          "dx_mean": 0.005399327535678821,
+          "dx_std": 0.01072610353725544,
+          "dy_mean": 0.005772777622610192,
+          "dy_std": 0.031231151145501828
+        },
+        "6": {
+          "pos": 6,
+          "label": "(-x,-y)",
+          "dx_mean": -0.037384794988656725,
+          "dx_std": 0.019525622644564047,
+          "dy_mean": -0.527619424788304,
+          "dy_std": 0.016997708547306405
+        },
+        "7": {
+          "pos": 7,
+          "label": "(0,-y)",
+          "dx_mean": -0.04071865267769681,
+          "dx_std": 0.01739011237371056,
+          "dy_mean": -0.5307585429704431,
+          "dy_std": 0.02755054862589886
+        },
+        "8": {
+          "pos": 8,
+          "label": "(+x,-y)",
+          "dx_mean": -0.03502352897930905,
+          "dx_std": 0.023418482854872833,
+          "dy_mean": -0.5273180756568081,
+          "dy_std": 0.061812244267617444
+        }
+      }
+    },
+    "0.18000": {
+      "tilt_angle": 0.17999999999999997,
+      "sweep_axis": "y",
+      "mean_shifts": {
+        "0": {
+          "pos": 0,
+          "label": "(-x,+y)",
+          "dx_mean": -0.03290254113526316,
+          "dx_std": 0.09599680194302222,
+          "dy_mean": 0.7113217119974706,
+          "dy_std": 0.05306061799712013
+        },
+        "1": {
+          "pos": 1,
+          "label": "(0,+y)",
+          "dx_mean": -0.02995236012402529,
+          "dx_std": 0.10089364311077591,
+          "dy_mean": 0.707029234204515,
+          "dy_std": 0.03605400437672946
+        },
+        "2": {
+          "pos": 2,
+          "label": "(+x,+y)",
+          "dx_mean": -0.020399821844102918,
+          "dx_std": 0.09811369701003568,
+          "dy_mean": 0.7217349821005883,
+          "dy_std": 0.03721731077316696
+        },
+        "3": {
+          "pos": 3,
+          "label": "(-x, 0)",
+          "dx_mean": -0.011599017271555568,
+          "dx_std": 0.03018820655535813,
+          "dy_mean": 0.004422627194321649,
+          "dy_std": 0.028210842561207494
+        },
+        "5": {
+          "pos": 5,
+          "label": "(+x, 0)",
+          "dx_mean": -0.010450037156351755,
+          "dx_std": 0.008111778699930725,
+          "dy_mean": 0.008386312193556478,
+          "dy_std": 0.017124003183060944
+        },
+        "6": {
+          "pos": 6,
+          "label": "(-x,-y)",
+          "dx_mean": -0.05751041605280989,
+          "dx_std": 0.034701278484156085,
+          "dy_mean": -0.5543085873738619,
+          "dy_std": 0.022792795533562532
+        },
+        "7": {
+          "pos": 7,
+          "label": "(0,-y)",
+          "dx_mean": -0.06594088992101206,
+          "dx_std": 0.013700109204912369,
+          "dy_mean": -0.5545117316341021,
+          "dy_std": 0.01602371128686314
+        },
+        "8": {
+          "pos": 8,
+          "label": "(+x,-y)",
+          "dx_mean": -0.09960320620389211,
+          "dx_std": 0.05363424792316081,
+          "dy_mean": -0.5421468732905623,
+          "dy_std": 0.07089062124823103
+        }
+      }
+    },
+    "0.20000": {
+      "tilt_angle": 0.19999999999999996,
+      "sweep_axis": "y",
+      "mean_shifts": {
+        "0": {
+          "pos": 0,
+          "label": "(-x,+y)",
+          "dx_mean": 0.02729414224536413,
+          "dx_std": 0.09173941642272397,
+          "dy_mean": 0.7238229943784062,
+          "dy_std": 0.07932076784446465
+        },
+        "1": {
+          "pos": 1,
+          "label": "(0,+y)",
+          "dx_mean": 0.03093071612897802,
+          "dx_std": 0.09209561470381837,
+          "dy_mean": 0.7415293461772308,
+          "dy_std": 0.0792151902878264
+        },
+        "2": {
+          "pos": 2,
+          "label": "(+x,+y)",
+          "dx_mean": 0.03495421016909859,
+          "dx_std": 0.0850805708785475,
+          "dy_mean": 0.7364757826128425,
+          "dy_std": 0.0801623980712266
+        },
+        "3": {
+          "pos": 3,
+          "label": "(-x, 0)",
+          "dx_mean": -0.03693816584063825,
+          "dx_std": 0.07030346885786057,
+          "dy_mean": 0.018229514053541607,
+          "dy_std": 0.033238206637870193
+        },
+        "5": {
+          "pos": 5,
+          "label": "(+x, 0)",
+          "dx_mean": 0.0029129465739060833,
+          "dx_std": 0.028972051090379522,
+          "dy_mean": -0.012680570282009284,
+          "dy_std": 0.019218134578898705
+        },
+        "6": {
+          "pos": 6,
+          "label": "(-x,-y)",
+          "dx_mean": 0.08363328597361033,
+          "dx_std": 0.1310980561666655,
+          "dy_mean": -0.6852915682204639,
+          "dy_std": 0.044279495822122185
+        },
+        "7": {
+          "pos": 7,
+          "label": "(0,-y)",
+          "dx_mean": 0.09175739556776534,
+          "dx_std": 0.14978219432607082,
+          "dy_mean": -0.6962140775371608,
+          "dy_std": 0.020808016016467482
+        },
+        "8": {
+          "pos": 8,
+          "label": "(+x,-y)",
+          "dx_mean": 0.09545631430432877,
+          "dx_std": 0.15036065218378633,
+          "dy_mean": -0.7058916458856175,
+          "dy_std": 0.037466812470743925
+        }
+      }
+    },
+    "0.22000": {
+      "tilt_angle": 0.21999999999999995,
+      "sweep_axis": "y",
+      "mean_shifts": {
+        "0": {
+          "pos": 0,
+          "label": "(-x,+y)",
+          "dx_mean": 0.07158296113248071,
+          "dx_std": 0.017174728716422245,
+          "dy_mean": 0.7435763088096337,
+          "dy_std": 0.009058076190224185
+        },
+        "1": {
+          "pos": 1,
+          "label": "(0,+y)",
+          "dx_mean": 0.07524220203545155,
+          "dx_std": 0.013510357831679077,
+          "dy_mean": 0.7540328608210757,
+          "dy_std": 0.011728094824555604
+        },
+        "2": {
+          "pos": 2,
+          "label": "(+x,+y)",
+          "dx_mean": 0.0746456927865438,
+          "dx_std": 0.016098713956521026,
+          "dy_mean": 0.7535349765294541,
+          "dy_std": 0.005212487022567471
+        },
+        "3": {
+          "pos": 3,
+          "label": "(-x, 0)",
+          "dx_mean": 0.0018755116686861584,
+          "dx_std": 0.01783052017123163,
+          "dy_mean": 0.007373676372026239,
+          "dy_std": 0.010935324520360692
+        },
+        "5": {
+          "pos": 5,
+          "label": "(+x, 0)",
+          "dx_mean": 0.0016540393519790086,
+          "dx_std": 0.0070825353584817756,
+          "dy_mean": 0.0010859140022830617,
+          "dy_std": 0.011587888711959432
+        },
+        "6": {
+          "pos": 6,
+          "label": "(-x,-y)",
+          "dx_mean": 0.01723947431096349,
+          "dx_std": 0.012322807412952953,
+          "dy_mean": -0.7098488803706686,
+          "dy_std": 0.013259301895278854
+        },
+        "7": {
+          "pos": 7,
+          "label": "(0,-y)",
+          "dx_mean": 0.014610797549994458,
+          "dx_std": 0.012230835917645547,
+          "dy_mean": -0.7190702359597481,
+          "dy_std": 0.014449762266943982
+        },
+        "8": {
+          "pos": 8,
+          "label": "(+x,-y)",
+          "dx_mean": 0.013935243728019487,
+          "dx_std": 0.009835690570685583,
+          "dy_mean": -0.7224140577809749,
+          "dy_std": 0.010291764186696351
+        }
+      }
+    },
+    "0.24000": {
+      "tilt_angle": 0.23999999999999996,
+      "sweep_axis": "y",
+      "mean_shifts": {
+        "0": {
+          "pos": 0,
+          "label": "(-x,+y)",
+          "dx_mean": 0.03802372668374119,
+          "dx_std": 0.004944662400032895,
+          "dy_mean": 0.7887496553541495,
+          "dy_std": 0.006400885668311072
+        },
+        "1": {
+          "pos": 1,
+          "label": "(0,+y)",
+          "dx_mean": 0.03651880911056651,
+          "dx_std": 0.009641037964475095,
+          "dy_mean": 0.8044389565010761,
+          "dy_std": 0.012863320636788751
+        },
+        "2": {
+          "pos": 2,
+          "label": "(+x,+y)",
+          "dx_mean": 0.044101940509153795,
+          "dx_std": 0.007384647338106486,
+          "dy_mean": 0.8001115585370144,
+          "dy_std": 0.009073011789351134
+        },
+        "3": {
+          "pos": 3,
+          "label": "(-x, 0)",
+          "dx_mean": 0.008816152498820885,
+          "dx_std": 0.0057293254023757885,
+          "dy_mean": 0.007992509712380524,
+          "dy_std": 0.005589335909826086
+        },
+        "5": {
+          "pos": 5,
+          "label": "(+x, 0)",
+          "dx_mean": -0.006972139177651116,
+          "dx_std": 0.007118831607002521,
+          "dy_mean": -0.0008039266210516871,
+          "dy_std": 0.008390904989406141
+        },
+        "6": {
+          "pos": 6,
+          "label": "(-x,-y)",
+          "dx_mean": -0.017740578726898094,
+          "dx_std": 0.009375322282955345,
+          "dy_mean": -0.775413610895248,
+          "dy_std": 0.008403612513832719
+        },
+        "7": {
+          "pos": 7,
+          "label": "(0,-y)",
+          "dx_mean": -0.018132138700684662,
+          "dx_std": 0.009338795160670951,
+          "dy_mean": -0.7797802495976157,
+          "dy_std": 0.0072095687490528835
+        },
+        "8": {
+          "pos": 8,
+          "label": "(+x,-y)",
+          "dx_mean": -0.02059512667851777,
+          "dx_std": 0.014739287698497337,
+          "dy_mean": -0.782263145087336,
+          "dy_std": 0.014275665102545687
+        }
+      }
+    },
+    "0.26000": {
+      "tilt_angle": 0.25999999999999995,
+      "sweep_axis": "y",
+      "mean_shifts": {
+        "0": {
+          "pos": 0,
+          "label": "(-x,+y)",
+          "dx_mean": 0.02083151869660469,
+          "dx_std": 0.009315457886211262,
+          "dy_mean": 0.8430003068342102,
+          "dy_std": 0.016372041108125585
+        },
+        "1": {
+          "pos": 1,
+          "label": "(0,+y)",
+          "dx_mean": 0.021682599257064793,
+          "dx_std": 0.007570787295004006,
+          "dy_mean": 0.863882786812951,
+          "dy_std": 0.006769899787819327
+        },
+        "2": {
+          "pos": 2,
+          "label": "(+x,+y)",
+          "dx_mean": 0.024062663306176547,
+          "dx_std": 0.011045807112216565,
+          "dy_mean": 0.8653888407382055,
+          "dy_std": 0.005729970679727379
+        },
+        "3": {
+          "pos": 3,
+          "label": "(-x, 0)",
+          "dx_mean": 0.004750008804103345,
+          "dx_std": 0.00523966800881098,
+          "dy_mean": 0.006181197379078185,
+          "dy_std": 0.004914833981962436
+        },
+        "5": {
+          "pos": 5,
+          "label": "(+x, 0)",
+          "dx_mean": -0.012167146892625168,
+          "dx_std": 0.012289477860401353,
+          "dy_mean": 0.004036695661943668,
+          "dy_std": 0.01249760299039239
+        },
+        "6": {
+          "pos": 6,
+          "label": "(-x,-y)",
+          "dx_mean": -0.044659260626394824,
+          "dx_std": 0.015954942214577363,
+          "dy_mean": -0.8362100904979343,
+          "dy_std": 0.013460725835183944
+        },
+        "7": {
+          "pos": 7,
+          "label": "(0,-y)",
+          "dx_mean": -0.04479979168177124,
+          "dx_std": 0.01957568936863789,
+          "dy_mean": -0.8607200499096279,
+          "dy_std": 0.01914948956077362
+        },
+        "8": {
+          "pos": 8,
+          "label": "(+x,-y)",
+          "dx_mean": -0.04711820589363924,
+          "dx_std": 0.017958329985466006,
+          "dy_mean": -0.873560898991309,
+          "dy_std": 0.02029800357318216
+        }
+      }
+    },
+    "0.28000": {
+      "tilt_angle": 0.27999999999999997,
+      "sweep_axis": "y",
+      "mean_shifts": {
+        "0": {
+          "pos": 0,
+          "label": "(-x,+y)",
+          "dx_mean": -0.003255294706877976,
+          "dx_std": 0.030079621203171942,
+          "dy_mean": 0.9260578798033293,
+          "dy_std": 0.0051265712912382895
+        },
+        "1": {
+          "pos": 1,
+          "label": "(0,+y)",
+          "dx_mean": 0.017129873162684817,
+          "dx_std": 0.0240533609465024,
+          "dy_mean": 0.9489728923130315,
+          "dy_std": 0.013584921048992202
+        },
+        "2": {
+          "pos": 2,
+          "label": "(+x,+y)",
+          "dx_mean": 0.032714185556733354,
+          "dx_std": 0.011414683689131384,
+          "dy_mean": 0.9509364773442031,
+          "dy_std": 0.013791271605450368
+        },
+        "3": {
+          "pos": 3,
+          "label": "(-x, 0)",
+          "dx_mean": 0.0003706518152739591,
+          "dx_std": 0.01727283804131683,
+          "dy_mean": 0.01959676361975653,
+          "dy_std": 0.031428128905443775
+        },
+        "5": {
+          "pos": 5,
+          "label": "(+x, 0)",
+          "dx_mean": -0.0055016770017118685,
+          "dx_std": 0.021909013332396615,
+          "dy_mean": 0.0021176358235834416,
+          "dy_std": 0.011999054730113264
+        },
+        "6": {
+          "pos": 6,
+          "label": "(-x,-y)",
+          "dx_mean": -0.0521730670227953,
+          "dx_std": 0.032407722985065265,
+          "dy_mean": -0.924597369860544,
+          "dy_std": 0.01702008779263347
+        },
+        "7": {
+          "pos": 7,
+          "label": "(0,-y)",
+          "dx_mean": -0.04679450735238788,
+          "dx_std": 0.014250384653210124,
+          "dy_mean": -0.9561598128573451,
+          "dy_std": 0.018143523266164318
+        },
+        "8": {
+          "pos": 8,
+          "label": "(+x,-y)",
+          "dx_mean": -0.03898980430353731,
+          "dx_std": 0.017207437147241548,
+          "dy_mean": -0.9672069385284203,
+          "dy_std": 0.015334340177323207
+        }
+      }
+    },
+    "0.30000": {
+      "tilt_angle": 0.3,
+      "sweep_axis": "y",
+      "mean_shifts": {
+        "0": {
+          "pos": 0,
+          "label": "(-x,+y)",
+          "dx_mean": 0.014532026141205278,
+          "dx_std": 0.02132527157844234,
+          "dy_mean": 1.0328885211519947,
+          "dy_std": 0.007494548775617478
+        },
+        "1": {
+          "pos": 1,
+          "label": "(0,+y)",
+          "dx_mean": 0.02796145177148901,
+          "dx_std": 0.017389385029037203,
+          "dy_mean": 1.048149533744572,
+          "dy_std": 0.007399899204104532
+        },
+        "2": {
+          "pos": 2,
+          "label": "(+x,+y)",
+          "dx_mean": 0.03834863832780684,
+          "dx_std": 0.016384536646309796,
+          "dy_mean": 1.0655300329665351,
+          "dy_std": 0.0010750822347686604
+        },
+        "3": {
+          "pos": 3,
+          "label": "(-x, 0)",
+          "dx_mean": 0.0027352781713489093,
+          "dx_std": 0.010839321099778572,
+          "dy_mean": 0.001257783969185766,
+          "dy_std": 0.011981814912261005
+        },
+        "5": {
+          "pos": 5,
+          "label": "(+x, 0)",
+          "dx_mean": -0.018724185385690362,
+          "dx_std": 0.007258799375643396,
+          "dy_mean": 0.005930143635669083,
+          "dy_std": 0.021723576460257993
+        },
+        "6": {
+          "pos": 6,
+          "label": "(-x,-y)",
+          "dx_mean": -0.05547344216120109,
+          "dx_std": 0.013361638366569213,
+          "dy_mean": -1.0380476581141465,
+          "dy_std": 0.01898225210054054
+        },
+        "7": {
+          "pos": 7,
+          "label": "(0,-y)",
+          "dx_mean": -0.05668089840696666,
+          "dx_std": 0.018082341597250633,
+          "dy_mean": -1.070181029228479,
+          "dy_std": 0.02166974735166801
+        },
+        "8": {
+          "pos": 8,
+          "label": "(+x,-y)",
+          "dx_mean": -0.06056731491767096,
+          "dx_std": 0.02596335499518946,
+          "dy_mean": -1.0596557290341024,
+          "dy_std": 0.014367746875998028
+        }
+      }
+    }
+  }
+}
