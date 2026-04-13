@@ -44,11 +44,12 @@ class ImagingSystem:
         Which camera trigger input line to use for hardware triggering.
     """
 
-    def __init__(self, hardware_trigger: bool = True, trigger_line: int = TRIGGER_LINE2):
+    def __init__(self, hardware_trigger: bool = True, trigger_line: int = TRIGGER_LINE2,
+                 xpr_port: str | None = None):
         log.info("Connecting to hardware...")
         self._hardware_trigger = hardware_trigger
         self._cam = DahengCamera(hardware_trigger=hardware_trigger, trigger_line=trigger_line)
-        self._xpr = XPRController()
+        self._xpr = XPRController(port=xpr_port)
         if hardware_trigger:
             self._xpr.setup_trigger_output()
         log.info("Camera: %dx%d, color=%s, hw_trigger=%s",
